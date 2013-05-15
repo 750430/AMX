@@ -78,7 +78,7 @@ define_function query_mixer()
 	nNumVolBars=0
 	for(x=1;x<=max_length_array(vol);x++)
 	{
-		if(length_string(vol[x].chan)>0 or length_string(vol[x].name)>0 or length_string(vol[x].instidTag)) nNumVolBars++
+		if(length_string(vol[x].chan)>0 or length_string(vol[x].name)>0) nNumVolBars++
 	}
 	if(!timeline_active(MixQueryTL)) timeline_create(MixQueryTL,lMixQueryTimes,nNumVolBars,timeline_relative,timeline_once)
 }
@@ -357,7 +357,7 @@ define_event //Timeline Events
 
 timeline_event[MixQueryTL]
 {
-	if(vol[timeline.sequence].chan>0 or length_string(vol[timeline.sequence].name)>0 or length_string(vol[timeline.sequence].instIDtag)>0) pulse[vdvMXR[timeline.sequence],MIX_QUERY]
+	if(vol[timeline.sequence].chan>0 or length_string(vol[timeline.sequence].name)>0) pulse[vdvMXR[timeline.sequence],MIX_QUERY]
 }
 
 #IF_DEFINED dvIPClient

@@ -303,7 +303,7 @@ VTC_PRES_4				=	144
 VTC_PRES_5				=	145 
 integer VTC_PRES[]		=	{141,142,143,144,145}
 VTC_OPTION				=	146
-VTC_VOL_UP			=	147	//Ramping: Volume Up
+VTC_VOL_UP				=	147	//Ramping: Volume Up
 VTC_VOL_DOWN			=	148	//Ramping: Volume Down
 VTC_VOL_MUTE_TOG		=	149	//Momentary: Mute Toggle
 VTC_VOL_MUTE_ON			=	150	//Momentary: Mute On
@@ -650,3 +650,4 @@ DEFINE_VARIABLE
 (*                     END OF PROGRAM                      *)
 (*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)
 (***********************************************************)
+ No newline at end of file
