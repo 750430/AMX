@@ -310,10 +310,16 @@ TIMELINE_EVENT[lTLCmd]
 			SWITCH(nCmd)
 			{
 				CASE VD_PWR_ON:
+				{
+					SEND_STRING dvLCD,cCmdStr[nCmd]
+					nPollType=PollPwr
+					on[dvLCD,VD_WARMING]
+				}				
 				CASE VD_PWR_OFF:
 				{
 					SEND_STRING dvLCD,cCmdStr[nCmd]
 					nPollType=PollPwr
+					on[dvLCD,VD_COOLING]
 				}
 				CASE VD_SRC_AUX1:
 				CASE VD_SRC_AUX2:
@@ -334,6 +340,7 @@ TIMELINE_EVENT[lTLCmd]
 					{
 						SEND_STRING dvLCD,cCmdStr[VD_PWR_ON]
 						nPollType=PollPwr
+						on[dvLCD,VD_WARMING]
 					}
 				}
 				CASE VD_VOL_MUTE_TOG:

@@ -12,7 +12,7 @@
 (*
     $History: $
 *)
-#include 'HoppSNAPI Rev5-09.axi'
+#include 'HoppSNAPI Rev5-10.axi'
 #include 'HoppDEV Rev5-01.axi'
 #include 'HoppSTRUCT Rev5-07.axi'
 #include 'Queue_and_Threshold_Sizes.axi'
@@ -248,7 +248,7 @@ define_start //IP
 
 define_start //Actual Startup
 
-#INCLUDE 'HoppSTART Rev5-02'
+#INCLUDE 'HoppSTART Rev5-03'
 (***********************************************************)
 (*                  MODULES GO BELOW                       *)
 (***********************************************************)
@@ -331,6 +331,7 @@ button_event[dvTP,btnStart]
 		send_command button.input.device,"'@PPN-',cSourcePopups[nActiveTP]"
 		send_command button.input.device,"'@PPN-',cHeaderPopups[nActiveTP]"		
 		show_startup_instructions(nActiveTP)
+		query_mixer()
 	}
 }
 
@@ -378,6 +379,8 @@ button_event[dvTP,btnShutDownConfirm]
 				}
 				for(x=1;x<=length_array(btnDests);x++) pulse[vdvDisp[x],VD_PWR_OFF]
 				switchaudio(0,1)
+				pulse[vdvVTC1,VTC_DISCONNECT]
+				pulse[vdvATC1,ATC_HANGUP]
 			}
 		}
 		off[nEnterTechMode]

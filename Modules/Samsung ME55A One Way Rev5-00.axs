@@ -114,6 +114,7 @@ CHANNEL_EVENT[vdvLCD,0]
 				IF([dvLCD,VD_PWR_ON])
 				{
 					SEND_STRING dvLCD,cCmdStr[nCmd]
+					SEND_STRING dvLCD,cCmdStr[VD_PWR_ON]
 				}
 				ELSE
 				{

@@ -353,6 +353,8 @@ timeline_event[lTLRampDown]
 (***********************************************************)
 define_program
 [dvTP,VTC_GRAPHICS]=nContent
+[dvTP,VTC_CONTENT_ON]=nContent
+[dvTP,VTC_CONTENT_OFF]=!nContent
 (***********************************************************)
 (*                     END OF PROGRAM                      *)
 (*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)

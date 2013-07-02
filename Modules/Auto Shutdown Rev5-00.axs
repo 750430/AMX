@@ -88,6 +88,7 @@ DEFINE_MUTUALLY_EXCLUSIVE
 
 define_function initiate_shutdown()
 {
+	send_string 0,"'initiate_shutdown()'"
 	send_command dvTP,"'ADBEEP'"
 	send_command dvTP,"'PAGE-Shut Down Warning'"
 	
@@ -408,6 +409,8 @@ DEFINE_PROGRAM
 [dvSetupTP,btnPM]=sdShutDownConfig.period=perPM
 
 [dvSetupTP,btnEnable]=sdShutDownConfig.enabled
+
+SYSTEM_CALL 'NEWDST'
 
 
 (***********************************************************)
