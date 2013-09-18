@@ -629,7 +629,7 @@ CLEARONE_SR1212		=	'G'
 //IP Device Types
 
 EXTRON_TYPE			=	1
-
+BIAMP_TYPE			=	2
 
 (***********************************************************)
 (*                     Video Display                       *)

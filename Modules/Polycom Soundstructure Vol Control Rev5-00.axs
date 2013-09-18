@@ -13,16 +13,7 @@ MODULE_NAME='Polycom Soundstructure Vol Control Rev5-00'(DEV vdvTP[], DEV vdvMix
 
 SET BAUD 9600,N,8,1 485 DISABLE
 
-	DEFINE_START
-	
-	VOL[1].instID		= 50          //<----You must fill this in!
-	VOL[1].addr 		= '1'					//Default: '1'
-	VOL[1].chan			= '1'					//Default: '1'
-	VOL[1].max			= 12					//Default: 12
-	VOL[1].min			= -40					//Default: -40
-	VOL[1].inc			= 1						//Default: 1
-	VOL[1].ramp 		= 8						//Default: 8
-	VOL[1].type			= FADER_TYPE			//Default: 'FDR'
+For IP Connections, use port 52774
 	
 	
 	
@@ -122,9 +113,9 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 				remove_string(cCompStr,cLvlResponse[x],1)
 				nPos=find_string(cCompStr,"'.'",1)
 				MXR_VOL[x].lvl=atoi(get_buffer_string(cCompStr,nPos-1))
-				send_string 0,"'MXR_VOL[x].lvl=',itoa(MXR_VOL[x].lvl)"
+				//send_string 0,"'MXR_VOL[x].lvl=',itoa(MXR_VOL[x].lvl)"
 				nAMXLvl= ABS_VALUE((255*(MXR_VOL[x].lvl-MXR_VOL[x].min))/(MXR_VOL[x].max-MXR_VOL[x].min))
-				send_string 0,"'nAMXLvl=',itoa(nAMXLvl)"
+				//send_string 0,"'nAMXLvl=',itoa(nAMXLvl)"
 				send_level vdvTP[x],1,nAMXLvl
 			}
 			active(find_string(cCompStr,cMuteResponse[x],1)):
@@ -178,8 +169,16 @@ DEFINE_FUNCTION OnPush(INTEGER nCmd,INTEGER nCurrentVolBar)
 		{
 			switch(MXR_VOL[nCurrentVolBar].mte)
 			{
-				case 1: send_string dvMixer,"cMteStr[MuteOff][nCurrentVolBar]"
-				case 0: send_string dvMixer,"cMteStr[MuteOn][nCurrentVolBar]"
+				case 1: 
+				{
+					send_string dvMixer,"cMteStr[MuteOff][nCurrentVolBar]"
+					//send_string 0,"cMteStr[MuteOff][nCurrentVolBar]"
+				}
+				case 0: 
+				{
+					send_string dvMixer,"cMteStr[MuteOn][nCurrentVolBar]"
+					//send_string 0,"cMteStr[MuteOn][nCurrentVolBar]"
+				}
 			}
 		}
 		CASE MIX_MUTE_OFF: 	send_string dvMixer,"cMteStr[MuteOff][nCurrentVolBar]"
@@ -211,6 +210,7 @@ DEFINE_FUNCTION Ramp(INTEGER nDirection, INTEGER nCurrentVolBar)
 //	STACK_VAR SINTEGER nValue
 
 send_string dvMixer,"cLvlStr[nDirection][nCurrentVolBar]"
+send_string 0,"cLvlStr[nDirection][nCurrentVolBar]"
 
 
 	//if chanin and chanout have length, we are dealing with a matrix point

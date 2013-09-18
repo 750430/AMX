@@ -8,7 +8,7 @@ module_name='ClearOne ATC Rev5-00'(dev dvTP, dev vdvATC, dev dvXAP, char cAddr[]
 (* REV HISTORY:                                            *)
 (***********************************************************)
 //non_volatile	char		cClearOneAddr[]='30'
-//define_module 'ClearOne ATC Rev4-00' atc1(vdvTP_ATC1,vdvATC1,dvClearOne,cClearOneAddr)
+//define_module 'ClearOne ATC Rev5-00' atc1(vdvTP_ATC1,vdvATC1,dvClearOne,cClearOneAddr)
 //SET BAUD 9600,N,8,1
 
 #include 'HoppSNAPI Rev5-00.axi'

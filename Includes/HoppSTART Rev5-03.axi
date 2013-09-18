@@ -80,7 +80,11 @@ define_function query_mixer()
 	{
 		if(length_string(vol[x].chan)>0 or length_string(vol[x].name)>0 or length_string(vol[x].instidTag)) nNumVolBars++
 	}
-	if(!timeline_active(MixQueryTL)) timeline_create(MixQueryTL,lMixQueryTimes,nNumVolBars,timeline_relative,timeline_once)
+	if(!timeline_active(MixQueryTL)) 
+	{
+		timeline_create(MixQueryTL,lMixQueryTimes,nNumVolBars,timeline_relative,timeline_once)
+		send_string 0,"'timeline create - nNumVolBars=',itoa(nNumVolBars)"
+	}
 }
 
 define_function openclient(integer nVal)

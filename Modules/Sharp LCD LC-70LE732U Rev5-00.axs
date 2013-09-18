@@ -65,10 +65,10 @@ DEFINE_LATCHING
 (*       MUTUALLY EXCLUSIVE DEFINITIONS GO BELOW           *)
 (***********************************************************)
 DEFINE_MUTUALLY_EXCLUSIVE
-([dvTP,VD_PWR_ON],[dvTP,VD_PWR_OFF])
+([dvTP,VD_PWR_ON],[dvTP,VD_PWR_OFF],[dvTP,VD_COOLING],[dvTP,VD_WARMING])
 ([dvTP,VD_SRC_AUX1],[dvTP,VD_SRC_AUX2],[dvTP,VD_SRC_AUX3],[dvTP,VD_SRC_AUX4],[dvTP,VD_SRC_CATV],[dvTP,VD_SRC_CMPNT1],[dvTP,VD_SRC_VID1],[dvTP,VD_SRC_VID2],[dvTP,VD_SRC_VGA1])
  
-([dvLCD,VD_PWR_ON],[dvLCD,VD_PWR_OFF])
+([dvLCD,VD_PWR_ON],[dvLCD,VD_PWR_OFF],[dvLCD,VD_COOLING],[dvLCD,VD_WARMING])
 ([dvLCD,VD_SRC_AUX1],[dvLCD,VD_SRC_AUX2],[dvLCD,VD_SRC_AUX3],[dvLCD,VD_SRC_AUX4],[dvLCD,VD_SRC_CATV],[dvLCD,VD_SRC_CMPNT1],[dvLCD,VD_SRC_VID1],[dvLCD,VD_SRC_VID2],[dvLCD,VD_SRC_VGA1])
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)

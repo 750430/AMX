@@ -13,6 +13,8 @@ MODULE_NAME='Polycom Soundstructure Dialer Rev5-00'(DEV vdvTP, DEV vdvATC, DEV d
 SET BAUD 9600,N,8,1 485 DISABLE
 
 define_module 'Polycom Soundstructure Dialer Rev5-00' atc1(vdvTP_ATC1,vdvATC1,dvPolycom) 
+
+For IP Connections, use port 52774
 *)
 (***********************************************************)
 #INCLUDE 'HoppSNAPI Rev5-01.axi'
