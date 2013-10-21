@@ -129,6 +129,10 @@ BUTTON_EVENT[dvTP, btnScenes]//call scenes
 		TO[button.input]
 		pulse[vdvLights,button.input.channel]
 	}
+	HOLD[10]:
+	{
+		send_command button.input.device,"'@AKB-;Type Something'" //Pop up the keypad so the user can input a speed dial number
+	}
 }
 
 channel_event[vdvLights,0]

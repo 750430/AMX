@@ -115,7 +115,10 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 		remove_string(cCompStr,' ',1)
 		cText=left_string(cCompStr,find_string(cCompStr,"$0D",1)-1)
 		spdMain[nPos].name=cText
-		if(spdMain[nPos].name=itoa(nPos)) {}
+		if(spdMain[nPos].name="''")
+		{
+			send_command vdvTP,"'^TXT-',itoa(ATC_SPEEDDIAL[nPos]),',0,Press to enter Speed Dial'"
+		}
 		else send_command vdvTP,"'^TXT-',itoa(ATC_SPEEDDIAL[nPos]),',0,',spdMain[nPos].name"
 	}
 	if(find_string(cCompStr,"'TISDENTRY ',itoa(nInstID),' '",1))
@@ -171,12 +174,21 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 	}	
 }
 
+define_function show_phone_number(char cNumber[])
+{
+	if(length_string(cNumber)<12) SEND_COMMAND vdvTP,"'!T',1,cNumber"	
+	else if(length_string(cNumber)<24) SEND_COMMAND vdvTP,"'!T',1,left_string(cNumber,12),$0D,$0A,mid_string(cNumber,13,12)"	
+	else SEND_COMMAND vdvTP,"'!T',1,mid_string(cNumber,length_string(cNumber)-23,12),$0D,$0A,right_string(cNumber,12)"
+}
+
 DEFINE_FUNCTION Key(CHAR nVal[1])
 {
 	IF(nHook)
 	{
 		cPhoneNum = "cPhoneNum,nVal"
-		SEND_COMMAND vdvTP,"'!T',1,cPhoneNum"	
+		show_phone_number(cPhoneNum)
+		
+		
 	}
 	ELSE 
 	{
@@ -185,7 +197,7 @@ DEFINE_FUNCTION Key(CHAR nVal[1])
 		if(nNewDigits) cInCallNum="cInCallNum,nVal"
 		else cInCallNum=nVal
 
-		SEND_COMMAND vdvTP,"'!T',1,cInCallNum"
+		show_phone_number(cInCallNum)
 		on[nNewDigits]
 		wait 50 'NewDigits' off[nNewDigits]
 		SEND_STRING dvATC,"cDialStr,nVal,$0A"
@@ -221,7 +233,7 @@ DEFINE_FUNCTION OnPush(INTEGER nCmd)
 			if (nHook)
 			{
 				cPhoneNum=LEFT_STRING(cPhoneNum,(LENGTH_STRING(cPhoneNum)-1))
-				SEND_COMMAND vdvTP,"'!T',1,cPhoneNum"	
+				show_phone_number(cPhoneNum)
 			}
 		}
 		CASE ATC_ANSWER: 		SEND_STRING dvATC,"'S',cHookStr,'0',$0A"
@@ -229,7 +241,7 @@ DEFINE_FUNCTION OnPush(INTEGER nCmd)
 		{
 			cPhoneNum=''
 			SEND_STRING dvATC,"'S',cHookStr,'1',$0A"	
-			SEND_COMMAND vdvTP,"'!T',1,cPhoneNum"	
+			show_phone_number(cPhoneNum)
 		}
 		CASE ATC_QUERY: 		SEND_STRING dvATC,"'G',cHookStr,$0A"
 		CASE ATC_FLASH:			send_string dvATC,"cFlashStr"

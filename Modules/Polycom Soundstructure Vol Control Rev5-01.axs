@@ -113,9 +113,9 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 				remove_string(cCompStr,cLvlResponse[x],1)
 				nPos=find_string(cCompStr,"'.'",1)
 				MXR_VOL[x].lvl=atoi(get_buffer_string(cCompStr,nPos-1))
-				send_string 0,"'MXR_VOL[x].lvl=',itoa(MXR_VOL[x].lvl)"
+				//send_string 0,"'MXR_VOL[x].lvl=',itoa(MXR_VOL[x].lvl)"
 				nAMXLvl= ABS_VALUE((255*(MXR_VOL[x].lvl-MXR_VOL[x].min))/(MXR_VOL[x].max-MXR_VOL[x].min))
-				send_string 0,"'nAMXLvl=',itoa(nAMXLvl)"
+				//send_string 0,"'nAMXLvl=',itoa(nAMXLvl)"
 				send_level vdvTP[x],1,nAMXLvl
 			}
 			active(find_string(cCompStr,cMuteResponse[x],1)):

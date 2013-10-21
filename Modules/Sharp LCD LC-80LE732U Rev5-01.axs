@@ -55,6 +55,9 @@ persistent integer nVolume
 persistent integer nMute
 volatile	integer	nCmdPwrOn
 
+volatile		integer		nPolling
+volatile		integer		nCommanding
+
 INTEGER nCmd=0
 
 (***********************************************************)
@@ -69,7 +72,7 @@ DEFINE_MUTUALLY_EXCLUSIVE
 ([dvTP,VD_PWR_ON],[dvTP,VD_PWR_OFF])
 ([dvTP,VD_SRC_HDMI1],[dvTP,VD_SRC_HDMI2],[dvTP,VD_SRC_HDMI3],[dvTP,VD_SRC_AUX1],[dvTP,VD_SRC_CMPNT1],[dvTP,VD_SRC_VID1],[dvTP,VD_SRC_VID2],[dvTP,VD_SRC_VGA1])
  
-([dvLCD,VD_PWR_ON],[dvLCD,VD_PWR_OFF])
+([dvLCD,VD_PWR_ON],[dvLCD,VD_PWR_OFF],[dvLCD,VD_COOLING],[dvLCD,VD_WARMING])
 ([dvLCD,VD_SRC_HDMI1],[dvLCD,VD_SRC_HDMI2],[dvLCD,VD_SRC_HDMI3],[dvLCD,VD_SRC_AUX1],[dvLCD,VD_SRC_CMPNT1],[dvLCD,VD_SRC_VID1],[dvLCD,VD_SRC_VID2],[dvLCD,VD_SRC_VGA1])
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)
@@ -349,7 +352,6 @@ TIMELINE_EVENT[lTLCmd]
 		}
 		CASE 2:	//2nd time
 		{
-			send_string 0,"'4'"
 			IF(nPollType) SEND_STRING dvLCD,cPollStr[nPollType]
 		}
 	}

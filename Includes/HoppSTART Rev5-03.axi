@@ -36,6 +36,7 @@ define_variable //IP Variables
 non_volatile	long		lReconnectTime[]={5000}
 non_volatile	long		lPollTL[]={60000}
 non_volatile	char		cBiampBuffer[255]
+non_volatile	char		cReconnect[100]
 
 define_variable //Feedback Variables
 
@@ -83,7 +84,6 @@ define_function query_mixer()
 	if(!timeline_active(MixQueryTL)) 
 	{
 		timeline_create(MixQueryTL,lMixQueryTimes,nNumVolBars,timeline_relative,timeline_once)
-		send_string 0,"'timeline create - nNumVolBars=',itoa(nNumVolBars)"
 	}
 }
 
@@ -95,6 +95,13 @@ define_function openclient(integer nVal)
 define_function closeclient(integer nVal)
 {
 	ip_client_close(ip[nVal].dvIP.PORT)
+}
+
+define_function reconnect_client(integer nVal)
+{
+	closeclient(nVal)
+	wait 10
+	openclient(nVal)
 }
 
 #IF_DEFINED dvBiamp
@@ -156,11 +163,17 @@ data_event[dvIPClient]
 	online:
 	{
 		on[IP[get_last(dvIPClient)].status]
+		if(cReconnect[get_last(dvIPClient)])
+		{
+			off[cReconnect[get_last(dvIPClient)]]
+			IP[get_last(dvIPClient)].reconn++
+		}
 	}
 	offline:
 	{
 		//ip[get_last(dvIPClient)].reconn++
 		off[IP[get_last(dvIPClient)].status]
+		on[cReconnect[get_last(dvIPClient)]]
 	}
 	string:
 	{
@@ -371,8 +384,7 @@ timeline_event[IPReconnectTL]
 	{
 		if(!ip[x].status && length_string(ip[x].ipaddress)>0)
 		{
-			closeclient(x)
-			openclient(x)
+			reconnect_client(x)
 		}
 	}
 }

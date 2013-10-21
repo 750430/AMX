@@ -104,11 +104,15 @@ define_function parse(cMsg[100])
 		active(find_string(cMsg,"'Conference Presentation Mode: Off'",1) or find_string(cMsg,"'Conference Presentation Mode: Receiving'",1) or find_string(cMsg,"'PresentationStopResult (status=OK)'",1)):
 		{
 			off[vdvTP,VTC_GRAPHICS]
+			off[vdvTP,VTC_CONTENT_ON]
+			on[vdvTP,VTC_CONTENT_OFF]
 			off[nPresentationStatus]
 		}
 		active(find_string(cMsg,"'Conference Presentation Mode: Sending'",1) or find_string(cMsg,"'PresentationStartResult (status=OK)'",1)):
 		{
 			on[vdvTP,VTC_GRAPHICS]
+			off[vdvTP,VTC_CONTENT_OFF]
+			on[vdvTP,VTC_CONTENT_ON]
 			on[nPresentationStatus]
 		}
 		active(find_string(cMsg,"'login:'",1)):

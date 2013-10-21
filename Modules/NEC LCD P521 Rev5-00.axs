@@ -16,7 +16,7 @@ MODULE_NAME='NEC LCD P521 Rev5-00'(dev dvTP, dev vdvLCD, dev dvLCD)
 
 *)
 
-#INCLUDE 'HoppSNAPI Rev5-00.axi'
+#INCLUDE 'HoppSNAPI Rev5-10.axi'
 (***********************************************************)
 (*               CONSTANT DEFINITIONS GO BELOW             *)
 (***********************************************************)
