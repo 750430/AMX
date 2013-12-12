@@ -25,16 +25,18 @@ MixQueryTL		=	3001
 IPReconnectTL	=	3002
 SlowFeedbackTL	=	3003
 IPPollTL		=	3004	//Timeline to slowly query Extron devices and keep them connected
+PollMixQueryTL	=	3005
 
 define_variable //Mixer Variables
 
 volatile		integer		nNumVolBars
 non_volatile	long		lMixQueryTimes[]={200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200}
+non_volatile	long		lPollMixQueryTimes[]={60000}
 
 define_variable //IP Variables
 
-non_volatile	long		lReconnectTime[]={5000}
-non_volatile	long		lPollTL[]={60000}
+non_volatile	long		lReconnectTime[]={300000}
+non_volatile	long		lPollTL[]={300000}
 non_volatile	char		cBiampBuffer[255]
 non_volatile	char		cReconnect[100]
 
@@ -81,6 +83,7 @@ define_function query_mixer()
 	{
 		if(length_string(vol[x].chan)>0 or length_string(vol[x].name)>0 or length_string(vol[x].instidTag)) nNumVolBars++
 	}
+	
 	if(!timeline_active(MixQueryTL)) 
 	{
 		timeline_create(MixQueryTL,lMixQueryTimes,nNumVolBars,timeline_relative,timeline_once)
@@ -119,14 +122,22 @@ define_start
 timeline_create(FeedbackTL,lFeedbackTime,1,timeline_relative,timeline_repeat)
 timeline_create(SlowFeedbackTL,lSlowFeedbackTime,1,timeline_relative,timeline_repeat)
 
+#IF_DEFINED nPollMixQuery
+
+timeline_create(PollMixQueryTL,lPollMixQueryTimes,1,timeline_relative,timeline_repeat)
+
+#END_IF
 
 #IF_DEFINED dvIPClient
-for(x=1;x<=100;x++) 
+wait 100
 {
-	if(length_string(ip[x].ipaddress)>0) 
-	{	
-		dvIPClient[x]=ip[x].dvIP
-		openclient(x)			//if IP address is defined, open client
+	for(x=1;x<=100;x++) 
+	{
+		if(length_string(ip[x].ipaddress)>0) 
+		{	
+			dvIPClient[x]=ip[x].dvIP
+			openclient(x)			//if IP address is defined, open client
+		}
 	}
 }
 
@@ -197,6 +208,30 @@ data_event[dvIPClient]
 		{
 			send_string data.device,"$1B,'0*65000TC',$0D,$0A"
 			send_string data.device,"$1B,'1*65000TC',$0D,$0A"
+		}
+	}
+	onerror:
+	{
+		switch(data.number)
+		{
+			case 0: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Success!'"
+			case 2: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] General Failure (Out of Memory) (IP_CLIENT_OPEN/IP_SERVER_OPEN)'"
+			case 4: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Unknown Host (IP_CLIENT_OPEN)'"
+			case 6: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Connection Refused (IP_CLIENT_OPEN)'"
+			case 7: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Connection Timed Out (IP_CLIENT_OPEN)'"
+			case 8: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Unknown Connection Error (IP_CLIENT_OPEN)'"
+			case 9: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Already Closed (IP_CLIENT_CLOSE/IP_SERVER_CLOSE)'"
+			case 10: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Binding Error (IP_SERVER_OPEN)'"
+			case 11: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Listening Error (IP_SERVER_OPEN)'"
+			case 13: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Send to Socket Unknown. Some other error (undefined) occurred in trying to do the sendto'"
+			case 14: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Local Port Already Used (IP_CLIENT_OPEN/IP_SERVER_OPEN)'"
+			case 15: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] UDP Socket Already Listening (IP_SERVER_OPEN)'"
+			case 16: send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Too Many Open Sockets (IP_CLIENT_OPEN/IP_SERVER_OPEN)'"
+			case 17: 
+			{
+				send_string 0,"'IP[',itoa(get_last(dvIPClient)),'] Local Port Not Open'"
+				openclient(get_last(dvIPClient))
+			}
 		}
 	}
 }
@@ -377,12 +412,22 @@ timeline_event[MixQueryTL]
 	if(vol[timeline.sequence].chan>0 or length_string(vol[timeline.sequence].name)>0 or length_string(vol[timeline.sequence].instIDtag)>0) pulse[vdvMXR[timeline.sequence],MIX_QUERY]
 }
 
+#IF_DEFINED nPollMixQuery
+
+timeline_event[PollMixQueryTL]
+{
+	query_mixer()
+}
+
+#END_IF
+
+
 #IF_DEFINED dvIPClient
 timeline_event[IPReconnectTL]
 {
-	for(x=1;x<=100;x++)
+	for(x=1;x<=nNumIPDevices;x++)
 	{
-		if(!ip[x].status && length_string(ip[x].ipaddress)>0)
+		if(!ip[x].status)
 		{
 			reconnect_client(x)
 		}
@@ -392,7 +437,7 @@ timeline_event[IPReconnectTL]
 
 timeline_event[IPPollTL]
 {
-	for(x=1;x<=100;x++)
+	for(x=1;x<=nNumIPDevices;x++)
 	{
 		if(ip[x].dev_type=EXTRON_TYPE)
 		{

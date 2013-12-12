@@ -90,7 +90,7 @@ DEFINE_MUTUALLY_EXCLUSIVE
 DEFINE_FUNCTION CmdExecuted()
 {
 	ncmd=0
-	TIMELINE_KILL(lTLCmd)
+	if(timeline_active(lTLCmd)) TIMELINE_KILL(lTLCmd)
 	TIMELINE_RESTART(lTLPoll)
 }
 
@@ -248,7 +248,9 @@ DATA_EVENT[dvProj]
 	{
 		nBufferCounter++
 		if(nBufferCounter>20) nBufferCounter=1
-		cBuffer[nBufferCounter+1]=''
+		
+		if(nBufferCounter=20) cBuffer[1]=''
+		else cBuffer[nBufferCounter+1]=''
 		
 		cBuffer[nBufferCounter]=data.text
 		

@@ -350,7 +350,6 @@ TIMELINE_EVENT[lTLCmd]
 		}
 		CASE 2:	//2nd time
 		{
-			send_string 0,"'4'"
 			IF(nPollType) SEND_STRING dvLCD,cPollStr[nPollType]
 		}
 	}

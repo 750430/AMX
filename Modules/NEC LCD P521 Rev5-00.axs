@@ -78,7 +78,7 @@ DEFINE_MUTUALLY_EXCLUSIVE
 define_function CmdExecuted()
 {
 	ncmd=0
-	TIMELINE_KILL(lTLCmd)
+	if(timeline_active(lTLCmd)) TIMELINE_KILL(lTLCmd)
 	TIMELINE_RESTART(lTLPoll)
 }
 

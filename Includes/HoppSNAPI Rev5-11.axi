@@ -148,7 +148,9 @@ ATC_SPEEDDIAL5		=	105	//Momentary: Speed Dial 5
 ATC_SPEEDDIAL6		=	106	//Momentary: Speed Dial 6
 ATC_SPEEDDIAL7		=	107	//Momentary: Speed Dial 7
 ATC_SPEEDDIAL8		=	108	//Momentary: Speed Dial 8
-integer ATC_SPEEDDIAL[]	=	{101,102,103,104,105,106,107,108}
+ATC_SPEEDDIAL9		=	109	//Momentary: Speed Dial 8
+ATC_SPEEDDIAL10		=	110	//Momentary: Speed Dial 8
+integer ATC_SPEEDDIAL[]	=	{101,102,103,104,105,106,107,108,109,110}
 
 ATC_SPEEDDIALNUM1	=	121	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM2	=	122	//Feedback: Speed Dial Number
@@ -158,7 +160,9 @@ ATC_SPEEDDIALNUM5	=	125	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM6	=	126	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM7	=	127	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM8	=	128	//Feedback: Speed Dial Number
-integer ATC_SPEEDDIALNUM[]	=	{121,122,123,124,125,126,127,128}
+ATC_SPEEDDIALNUM9	=	129	//Feedback: Speed Dial Number
+ATC_SPEEDDIALNUM10	=	130	//Feedback: Speed Dial Number
+integer ATC_SPEEDDIALNUM[]	=	{121,122,123,124,125,126,127,128,129,130}
 
 
 

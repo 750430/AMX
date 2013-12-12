@@ -9,7 +9,7 @@ module_name='Polycom HDX Series Rev5-02'(dev dvTP,dev vdvVTC,dev dvVTC,integer n
 (***********************************************************)
 
 //SET BAUD 9600,N,8,1
-//define_module 'Polycom HDX Series Rev5-02' vtc1(vdvTP_VTC1,vdvVTC1,dvVTC)
+//define_module 'Polycom HDX Series Rev5-02' vtc1(vdvTP_VTC1,vdvVTC1,dvVTC,nVTCContentInput)
 
 #include 'HoppSNAPI Rev5-10.axi'
 

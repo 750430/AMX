@@ -203,12 +203,12 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 
 define_function RampUp()
 {
-	timeline_create(ltlRampUp,lRampTimes,length_array(lRampTimes),timeline_relative,timeline_repeat)
+	if(!timeline_active(lTLRampUp)) timeline_create(ltlRampUp,lRampTimes,length_array(lRampTimes),timeline_relative,timeline_repeat)
 }
 
 define_function RampDown()
 {
-	timeline_create(ltlRampDown,lRampTimes,length_array(lRampTimes),timeline_relative,timeline_repeat)
+	if(!timeline_active(lTLRampDown)) timeline_create(ltlRampDown,lRampTimes,length_array(lRampTimes),timeline_relative,timeline_repeat)
 }
 
 define_function StopRamp()
@@ -379,11 +379,15 @@ CHANNEL_EVENT[vdvLCD,0]
 			{
 				nCmd=channel.channel
 				TIMELINE_PAUSE(lTLPoll)
-				WAIT 1 TIMELINE_CREATE(lTLCmd,lCmdArray,length_array(lCmdArray),TIMELINE_RELATIVE,TIMELINE_REPEAT)
+				WAIT 1 
+				{
+					if(timeline_active(lTLCmd)) TIMELINE_KILL(lTLCmd)
+					TIMELINE_CREATE(lTLCmd,lCmdArray,length_array(lCmdArray),TIMELINE_RELATIVE,TIMELINE_REPEAT)
+				}
 			}
 			ACTIVE(channel.channel=200):
 			{
-				TIMELINE_CREATE(lTLPoll,lPollArray,length_array(lPollArray),TIMELINE_RELATIVE,TIMELINE_REPEAT)
+				if(!timeline_active(lTLPoll)) TIMELINE_CREATE(lTLPoll,lPollArray,length_array(lPollArray),TIMELINE_RELATIVE,TIMELINE_REPEAT)
 			}
 		}
 	}
