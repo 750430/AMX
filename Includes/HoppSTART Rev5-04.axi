@@ -441,10 +441,8 @@ timeline_event[IPPollTL]
 {
 	for(x=1;x<=nNumIPDevices;x++)
 	{
-		if(ip[x].dev_type=EXTRON_TYPE)
-		{
-			send_string dvIPClient[x],"'Q'"
-		}
+		if(ip[x].dev_type=EXTRON_TYPE) send_string dvIPClient[x],"'Q'"	
+		if(ip[x].dev_type=CLEARONE_TYPE) send_string dvIPClient[x],"'VER'"	
 	}
 }
 

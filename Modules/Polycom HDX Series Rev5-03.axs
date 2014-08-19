@@ -11,6 +11,10 @@ module_name='Polycom HDX Series Rev5-03'(dev dvTP,dev vdvVTC,dev dvVTC,integer n
 //SET BAUD 9600,N,8,1
 //define_module 'Polycom HDX Series Rev5-03' vtc1(vdvTP_VTC1,vdvVTC1,dvVTC,nVTCContentInput)
 
+//define_variable //VTC Variables
+//
+//volatile		integer		nVTCContentInput=4
+
 #include 'HoppSNAPI Rev5-10.axi'
 
 (***********************************************************)
@@ -115,7 +119,7 @@ define_function OnPush (integer nIndex)
 		case VTC_KEY_KEYBRD: 		send_string dvVTC,"'button keyboard',$0D"
 		case VTC_CALLHANGUP: 		send_string dvVTC,"'button callhangup',$0D"
 		case VTC_CONNECT: 			send_string dvVTC,"'button call',$0D"
-		case VTC_DISCONNECT: 		send_string dvVTC,"'hangup video',$0D"
+		case VTC_DISCONNECT: 		send_string dvVTC,"'button hangup',$0D"
 		case VTC_UP: 				send_string dvVTC,"'button up',$0D"
 		case VTC_DOWN: 				send_string dvVTC,"'button down',$0D"
 		case VTC_LEFT: 				send_string dvVTC,"'button left',$0D"

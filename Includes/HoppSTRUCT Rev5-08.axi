@@ -30,7 +30,7 @@ structure source
 	char paneright[35] //Right Popup Nav
 	integer hassubmenu
 	integer activesubmenu[8]
-	char submenupopups[7][25]
+	char submenupopups[7][35]
 }
 
 //used for any destination type in a system
@@ -65,11 +65,11 @@ structure destination
 structure menu
 {
 	integer hassubmenu
-	char paneleft[35]
-	char paneright[35]
+	char paneleft[45]
+	char paneright[45]
 	char popup[35]
 	integer activesubmenu[8]
-	char submenupopups[8][35]
+	char submenupopups[8][45]
 }
 
 structure window

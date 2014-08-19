@@ -233,7 +233,7 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 		CASE PollLamp:	//Lamp Hours
 		{
 			nLamp = ATOI("LEFT_STRING(cCompStr,5)")	
-			SEND_COMMAND vdvTP,"'^TXT-',itoa(1),',0,',ITOA(nLamp)"
+			SEND_COMMAND vdvTP,"'^TXT-',itoa(1),',0,Lamp Hours: ',ITOA(nLamp)"
 		}
 	}	
 }

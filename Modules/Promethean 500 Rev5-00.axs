@@ -28,6 +28,8 @@ tlCmd		= 2002
 PollPower	=	1
 PollInput	=	2
 
+
+
 (***********************************************************)
 (*               VARIABLE DEFINITIONS GO BELOW             *)
 (***********************************************************)
@@ -45,17 +47,20 @@ volatile		integer	nPollType
 
 volatile		integer	nCmd
 
+integer x
+
+
+volatile		integer		nActivePower
+volatile		integer		nActiveInput
+
+volatile		integer		nPower[]={VD_PWR_ON,VD_PWR_OFF,VD_WARMING,VD_COOLING}
+volatile		integer		nInput[]={VD_SRC_VGA1,VD_SRC_HDMI1}
+
+
 (***********************************************************)
 (*       MUTUALLY EXCLUSIVE DEFINITIONS GO BELOW           *)
 (***********************************************************)
 define_mutually_exclusive
-
-([dvTP,VD_PWR_ON],[dvTP,VD_PWR_OFF])
-([dvTP,VD_SRC_VGA1],[dvTP,VD_SRC_HDMI1])
-
-
-([dvBoard,VD_PWR_ON],[dvBoard,VD_WARMING],[dvBoard,VD_COOLING],[dvBoard,VD_PWR_OFF])
-([dvBoard,VD_SRC_VGA1],[dvBoard,VD_SRC_HDMI1])
 
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)
@@ -82,38 +87,28 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 	{
 		ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_PWR_ON],1)):
 		{			
-			ON[dvTP,VD_PWR_ON]
-			ON[dvBoard,VD_PWR_ON]
-			IF(nCmd = VD_PWR_ON) CmdExecuted()
+			if(nActivePower<>VD_COOLING)
+			{
+				nActivePower=VD_PWR_ON
+				IF(nCmd = VD_PWR_ON) CmdExecuted()
+			}
 		}
 		ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_PWR_OFF],1)):
 		{	
-			ON[dvBoard,VD_PWR_OFF]
-			ON[dvTP,VD_PWR_OFF]
-			IF(nCmd = VD_PWR_OFF) CmdExecuted()
+			if(nActivePower<>VD_WARMING)
+			{
+				nActivePower=VD_PWR_OFF
+				IF(nCmd = VD_PWR_OFF) CmdExecuted()
+			}
 		}
-//		ACTIVE((FIND_STRING(cCompStr,cRespStr[VD_WARMING],1)) or (find_string(cCompStr,"'urning On'",1))): 	//Warming Up
-//		{
-//			ON[dvBoard,VD_WARMING]
-//			ON[dvTP,VD_PWR_ON]
-//			IF(ncmd = VD_PWR_ON) CmdExecuted()
-//		}
-//		ACTIVE((FIND_STRING(cCompStr,cRespStr[VD_COOLING],1)) or (find_string(cCompStr,"'Turning Off'",1))):	//Cooling Down
-//		{
-//			ON[dvBoard,VD_COOLING]
-//			ON[dvTP,VD_PWR_OFF]
-//			IF(ncmd = VD_PWR_OFF) CmdExecuted()
-//		}
 		active(find_string(cCompStr,cRespStr[VD_SRC_VGA1],1)):
 		{
-			on[dvBoard,VD_SRC_VGA1]
-			on[dvTP,VD_SRC_VGA1]
+			nActiveInput=VD_SRC_VGA1
 			if(nCmd=VD_SRC_VGA1) CmdExecuted()
 		}
 		active(find_string(cCompStr,cRespStr[VD_SRC_HDMI1],1)):
 		{
-			on[dvBoard,VD_SRC_HDMI1]
-			on[dvTP,VD_SRC_HDMI1]
+			nActiveInput=VD_SRC_HDMI1
 			if(nCmd=VD_SRC_HDMI1) CmdExecuted()
 		}		
 	}
@@ -137,8 +132,6 @@ cPollStr[PollInput]			= "'~qS',$0D"
 
 cRespStr[VD_PWR_ON] 		= "'On'"
 cRespStr[VD_PWR_OFF]		= "'Off'"
-//cRespStr[VD_COOLING]		= "''"
-//cRespStr[VD_WARMING]		= "'owerstate=powering'"
 
 cRespStr[VD_SRC_VGA1]		= "'RGB'"
 cRespStr[VD_SRC_HDMI1]		= "'HDMI'"
@@ -208,15 +201,21 @@ TIMELINE_EVENT[tlCmd]		//Projector Commands
 			SWITCH(nCmd)
 			{
 				CASE VD_PWR_ON:
+				{
+					SEND_STRING dvBoard,cCmdStr[nCmd]
+					if(nActivePower<>VD_PWR_ON)	nActivePower=VD_WARMING
+					nPollType=PollPower
+				}
 				CASE VD_PWR_OFF: 
 				{
 					SEND_STRING dvBoard,cCmdStr[nCmd]
+					if(nActivePower<>VD_PWR_OFF) nActivePower=VD_COOLING
 					nPollType=PollPower
 				}
 				CASE VD_SRC_VGA1:
 				CASE VD_SRC_HDMI1:
 				{
-					IF([dvBoard,VD_PWR_ON])
+					IF(nActivePower=VD_PWR_ON)
 					{
 						SEND_STRING dvBoard,cCmdStr[nCmd]
 						nPollType=PollInput
@@ -224,6 +223,7 @@ TIMELINE_EVENT[tlCmd]		//Projector Commands
 					ELSE
 					{
 						SEND_STRING dvBoard,cCmdStr[VD_PWR_ON]
+						nActivePower=VD_WARMING
 						nPollType=PollPower
 					}
 				}
@@ -282,7 +282,17 @@ BUTTON_EVENT[dvTP,0]
 (*            THE ACTUAL PROGRAM GOES BELOW                *)
 (***********************************************************)
 DEFINE_PROGRAM
+for(x=1;x<=length_array(nPower);x++) 
+{
+	[dvBoard,nPower[x]]=nActivePower=nPower[x]
+	[dvTP,nPower[x]]=nActivePower=nPower[x]
+}
 
+for(x=1;x<=length_array(nInput);x++)
+{
+	[dvBoard,nInput[x]]=nActiveInput=nInput[x]
+	[dvTP,nInput[x]]=nActiveInput=nInput[x]
+}
 
 (***********************************************************)
 (*                     END OF PROGRAM                      *)

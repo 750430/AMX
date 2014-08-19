@@ -182,7 +182,7 @@ channel_event[vdvATC,0]
 (***********************************************************)
 DEFINE_PROGRAM
 
-[dvTP, 251] = nHOOK
+[dvTP, ATC_OFF_HOOK] = nHOOK
 (***********************************************************)
 (*                     END OF PROGRAM                      *)
 (*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)

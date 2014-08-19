@@ -308,12 +308,12 @@ CHANNEL_EVENT [vdvVTC, 0]
 			CASE VTC_F4:				SEND_STRING dvVTC, "'xCommand Key Click Key:F4 Duration:1',$0D,$0A"
 			CASE VTC_F5:				SEND_STRING dvVTC, "'xCommand Key Click Key:F5 Duration:1',$0D,$0A"
 			CASE VTC_WAKE:			send_string dvVTC,"'xCommand Standby Deactivate',$0D,$0A"
-			CASE VTC_ZOOM_IN:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Zoom:in ZoomSpeed:14',$0D,$0A"
-			CASE VTC_ZOOM_OUT:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Zoom:out ZoomSpeed:14',$0D,$0A"
-			CASE VTC_CAM_UP:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Tilt:up TiltSpeed:2',$0D,$0A"
-			CASE VTC_CAM_DOWN:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Tilt:down TiltSpeed:2',$0D,$0A"
-			CASE VTC_CAM_LEFT: 		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Pan:left PanSpeed:2',$0D,$0A"
-			CASE VTC_CAM_RIGHT: 	SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Pan:right PanSpeed:2',$0D,$0A"
+			CASE VTC_ZOOM_IN:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Zoom:in ZoomSpeed:8',$0D,$0A"
+			CASE VTC_ZOOM_OUT:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Zoom:out ZoomSpeed:8',$0D,$0A"
+			CASE VTC_CAM_UP:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Tilt:up TiltSpeed:1',$0D,$0A"
+			CASE VTC_CAM_DOWN:		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Tilt:down TiltSpeed:1',$0D,$0A"
+			CASE VTC_CAM_LEFT: 		SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Pan:left PanSpeed:1',$0D,$0A"
+			CASE VTC_CAM_RIGHT: 	SEND_STRING dvVTC,"'xCommand Camera Ramp CameraId:1 Pan:right PanSpeed:1',$0D,$0A"
 			CASE VTC_NR_VID1:
 			CASE VTC_NR_VID2:
 			CASE VTC_NR_VID3:

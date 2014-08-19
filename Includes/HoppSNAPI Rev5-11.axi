@@ -324,6 +324,7 @@ CAM_PRESET3			=	7		//Momentary:
 CAM_PRESET4			=	8		//Momentary:
 CAM_PRESET5			=	9		//Momentary:
 CAM_PRESET6			=	10		//Momentary:
+integer CAM_PRESETS[]		=	{5,6,7,8,9,19}
 CAM_STORE1			=	11		//Momentary:
 CAM_STORE2			=	12		//Momentary:
 CAM_STORE3			=	13		//Momentary:
@@ -654,6 +655,7 @@ CLEARONE_SR1212		=	'G'
 
 EXTRON_TYPE			=	1
 BIAMP_TYPE			=	2
+CLEARONE_TYPE		=	3
 
 (***********************************************************)
 (*                     Video Display                       *)
@@ -674,4 +676,4 @@ DEFINE_VARIABLE
 (*                     END OF PROGRAM                      *)
 (*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)
 (***********************************************************)
- No newline at end of file
+

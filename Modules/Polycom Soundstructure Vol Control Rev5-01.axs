@@ -17,7 +17,7 @@ For IP Connections, use port 52774
 	
 	
 	
-	define_module 'Polycom Soundstructure Vol Control Rev5-00' mxr1(vdvTP_VOL,vdvMXR,dvPolycom) 
+	define_module 'Polycom Soundstructure Vol Control Rev5-01' mxr1(vdvTP_VOL,vdvMXR,dvPolycom) 
 
 *)
 (***********************************************************)
@@ -318,8 +318,8 @@ DATA_EVENT[dvMixer]
 {
 	STRING:
 	{
-		LOCAL_VAR CHAR cHold[100]
-		LOCAL_VAR CHAR cBuff[255]
+		LOCAL_VAR CHAR cHold[2056]
+		LOCAL_VAR CHAR cBuff[2056]
 		LOCAL_VAR CHAR cFullStr[100]
 		STACK_VAR INTEGER nPos
 		

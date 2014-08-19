@@ -113,7 +113,7 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 					ON[dvProj,VD_PWR_ON]
 					IF(nCmd = VD_PWR_ON) CmdExecuted()
 				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_PWR_OFF],1)):
+				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_PWR_OFF],1) or find_string (cCompStr,"'04'",1)):
 				{	
 					ON[dvProj,VD_PWR_OFF]
 					ON[vdvTP,VD_PWR_OFF]
@@ -125,7 +125,7 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 					ON[vdvTP,VD_PWR_ON]
 					IF(ncmd = VD_PWR_ON) CmdExecuted()
 				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_COOLING],1)):	//Cooling Down
+				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_COOLING],1) or find_string (cCompStr,"'24'",1)):	//Cooling Down
 				{
 					ON[dvProj,VD_COOLING]
 					ON[vdvTP,VD_PWR_OFF]
@@ -218,7 +218,7 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 		CASE PollLamp:	//Lamp Hours
 		{
 			nLamp = ATOI("LEFT_STRING(cCompStr,5)")	
-			SEND_COMMAND vdvTP,"'^TXT-',itoa(1),',0,',ITOA(nLamp)"
+			SEND_COMMAND vdvTP,"'^TXT-',itoa(1),',0,Lamp Hours: ',ITOA(nLamp)"
 		}
 	}	
 }
@@ -338,6 +338,7 @@ TIMELINE_EVENT[lTLCmd]		//Projector Commands
 				CASE VD_SRC_VGA1:
 				CASE VD_SRC_VGA2:
 				CASE VD_SRC_CMPNT1:
+				CASE VD_SRC_HDMI1:
 				{
 					IF([dvProj,VD_PWR_ON])
 					{

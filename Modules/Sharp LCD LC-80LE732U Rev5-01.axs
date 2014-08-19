@@ -89,6 +89,8 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 {
 	STACK_VAR INTEGER nVar
 	
+	//if(find_string(cCompStr,"'ERR'",1)) SEND_STRING dvLCD,"cPollStr[nPollType]"
+	
 	SWITCH(nPollType)
 	{
 		CASE PollPwr:
@@ -197,7 +199,7 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 					CmdExecuted()
 				}
 			}
-		}		
+		}	
 	}	
 }
 
@@ -264,6 +266,10 @@ DEFINE_EVENT
 
 DATA_EVENT[dvLCD]
 {
+	online:
+	{
+		send_string dvLCD,"'RSPW1   ',$0D"
+	}
 	STRING:
 	{
 		LOCAL_VAR CHAR cHold[100]

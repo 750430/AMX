@@ -117,6 +117,7 @@ structure ipcomm
 	integer port
 	integer type 		
 	integer status
+	integer dev_type
 }
 
 (***********************************************************)

@@ -34,9 +34,17 @@ DEFINE_DEVICE
 (***********************************************************)
 DEFINE_CONSTANT
 
-PollCounter 	= 1
+PollCounter 	=	1
 PollTrack		=	2
+PollStatus		=	3
 LONG lTLPoll 	= 2000
+
+stRecord		=	1
+stRecordPause	=	2
+stStop			=	3
+stPlay			=	4
+stPause			=	5
+stOther			=	6
 (***********************************************************)
 (*              DATA TYPE DEFINITIONS GO BELOW             *)
 (***********************************************************)
@@ -55,6 +63,7 @@ CHAR cCmdStr[10][20]
 CHAR cPollStr[4][10]
 
 integer nRecording
+integer nDeckStatus
 
 LONG lArray[]={500,500,500,500,500,500,500,500,500,500}
 (***********************************************************)
@@ -98,25 +107,39 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 			cSecs=(GET_BUFFER_STRING(cTemp,2))
 			SEND_COMMAND vdvTP,"'^TXT-',ITOA(DVR_COUNTER_TXT),',1&2,',cHour,':',cMins,':',cSecs"
 		}
-		ACTIVE(FIND_STRING(cCompStr,"'@0STRU'",1) or FIND_STRING(cCompStr,"'@0STRP'",1) or FIND_STRING(cCompStr,"'@0STRE'",1)):
-		{
-			ON[vdvDevice,DVR_REC_ON]
-			on[vdvTP,DVR_REC_ON]
-			//send_command vdvTP,"'^TXT-',itoa(DVR_TRACK_TXT),',0,Recording'"
-			on[nRecording]
-		}
-		ACTIVE(FIND_STRING(cCompStr,"'@0ST'",1)):		
-		{
-			ON[vdvDevice,DVR_REC_OFF]
-			//send_command vdvTP,"'^TXT-',itoa(DVR_TRACK_TXT),',0,Idle'"
-			off[nRecording]
-		}
+		ACTIVE(FIND_STRING(cCompStr,"'@0STRU'",1)): nDeckStatus=stRecord
+		ACTIVE(FIND_STRING(cCompStr,"'@0STRP'",1)): nDeckStatus=stRecordPause
+		ACTIVE(FIND_STRING(cCompStr,"'@0STRE'",1)): nDeckStatus=stRecord
+		ACTIVE(FIND_STRING(cCompStr,"'@0STST'",1)): nDeckStatus=stStop
+		ACTIVE(FIND_STRING(cCompStr,"'@0STTS'",1)): nDeckStatus=stStop
+		ACTIVE(FIND_STRING(cCompStr,"'@0STPL'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STPP'",1)): nDeckStatus=stPause
+		ACTIVE(FIND_STRING(cCompStr,"'@0STS+'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STS-'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STFF'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STRW'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STAB'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STEP'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STEA'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STED'",1)): nDeckStatus=stPlay
+		ACTIVE(FIND_STRING(cCompStr,"'@0STER'",1)): nDeckStatus=stOther
+		ACTIVE(FIND_STRING(cCompStr,"'@0ST'",1)): nDeckStatus=stOther
+	}
+	switch(nDeckStatus)
+	{
+		case stRecord: send_command vdvTP,"'^TXT-1,0,Recording in Progress'"
+		case stRecordPause: send_command vdvTP,"'^TXT-1,0,Recording Paused - Press Record to Resume'"
+		case stStop: send_command vdvTP,"'^TXT-1,0,Recorder Idle'"
+		case stPlay: send_command vdvTP,"'^TXT-1,0,Playing . . .'"
+		case stPause: send_command vdvTP,"'^TXT-1,0,Recorder Paused'"
+		case stOther: send_command vdvTP,"'^TXT-1,0,'"
 	}
 }
 
 DEFINE_FUNCTION OnPush(INTEGER nIndex)
 {
 	SEND_STRING dvDevice,"cCmdStr[nIndex]"
+	SEND_STRING dvDevice,"cPollStr[PollStatus]"
 	send_string dvDevice,"cPollStr[PollTrack]"
 }
 
@@ -137,6 +160,7 @@ cCmdStr[DVR_PWR_ON]		="'@023PW',$0D"
 
 cPollStr[PollCounter]	="'@0?TI',$0D"
 cPollStr[PollTrack]		="'@0?TR',$0D"
+cPollStr[PollStatus]	="'@0?ST',$0D"
 
 (***********************************************************)
 (*                THE EVENTS GO BELOW                      *)
@@ -187,6 +211,7 @@ TIMELINE_EVENT[lTLPoll]
 		active(timeline.sequence=1):
 		{
 			SEND_STRING dvDevice,"cPollStr[PollTrack]"
+			SEND_STRING dvDevice,"cPollStr[PollStatus]"
 		}
 		active(1):
 		{
@@ -212,7 +237,13 @@ BUTTON_EVENT [vdvTP,nPanelBtn]
 (*            THE ACTUAL PROGRAM GOES BELOW                *)
 (***********************************************************)
 DEFINE_PROGRAM
-[vdvTP,DVR_REC_ON]=nRecording
+
+
+[vdvTP,DVR_REC_ON]=nDeckStatus=stRecord
+[vdvTP,DVR_REC]=(nDeckStatus=stRecord or nDeckStatus=stRecordPause)
+[vdvTP,DVR_PLAY]=nDeckStatus=stPlay
+[vdvTP,DVR_PAUSE]=(nDeckStatus=stPause or nDeckStatus=stRecordPause)
+[vdvTP,DVR_STOP]=nDeckStatus=stStop
 (***********************************************************)
 (*                     END OF PROGRAM                      *)
 (*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)
