@@ -1,0 +1,188 @@
+PROGRAM_NAME='NEWDST'
+(*   DATE:11/09/06    PES     *)
+(**************************************)
+(* CALL NAME: DAYLIGHT SAVINGS        *)
+(* FUNCTION:  ADJUST FOR DAYLIGHT SAV.*)
+(**************************************)
+#IF_DEFINED __NETLINX__
+DEFINE_CALL 'NEWDST'
+LOCAL_VAR
+char    CUR_DATE[12]                       (* CURRENT DATE STRING *)
+integer DAY_OF_MONTH                       (* DAY OF MONTH (INT) *)
+integer MONTH                              (* MONTH (INT) *)
+char    YEAR[12]                           (* YEAR *)     
+integer TIME_CHANGED                       (* 1 IF TIME WAS CHANGED *)
+{
+(* THE FOLLOWING EXCERPT IS OFFERED AS AN EXPLANATION AND IS FROM:
+   http://www4.law.cornell.edu/uscode/15/260a.html
+   United States Code
+   TITLE 15 - COMMERCE AND TRADE
+   CHAPTER 6 - WEIGHTS AND MEASURES AND STANDARD TIME
+   SUBCHAPTER IX - STANDARD TIME
+   Sec. 260a. Advancement of time or changeover dates
+
+   (a) Duration of period; State exemption
+   During the period commencing at 2 o'clock antemeridian on the first Sunday
+   of April of each year and ending at 2 o'clock antemeridian on the last Sunday
+   of October of each year, the standard time of each zone established by
+   sections 261 to 264 of this of this title, as modified by section 265 of
+   this title, shall be advanced one hour and such time as so advanced shall
+   for the purposes of such sections 261 to 264, as so modified, be the standard
+   time of such zone during such period; however, (1) any State that
+   lies entirely within one time zone may by law exempt itself from the
+   provisions of this subsection providing for the advancement of time,
+   but only if that law provides that the entire State (including all political
+   subdivisions thereof) shall observe the standard time otherwise applicable
+   during that period, and (2) any State with parts thereof in more than one
+   time zone may by law exempt either the entire State as provided in (1) or
+   may exempt the entire area of the State lying within any time zone.
+	 
+	 As prescribed: The Energy Policy Act of 2005 Rule 
+
+		Start: Second Sunday in March 
+
+		End: First Sunday in November 
+
+		Time: 2 am local time 
+
+		Beginning in 2007, Daylight Saving Time is extended one month
+		and the schedule for the states of the United States that adopt daylight saving time will be:
+
+		2 a.m. on the Second Sunday in March to
+		2 a.m. on the First Sunday of November.
+*)
+
+  (* NOTIFY *)
+#IF_DEFINED SYSCALL_NOTIFY
+  WAIT 50
+    SEND_STRING 0,"'IN SYSCALL ',39,'NEWDST',39,13,10"
+#END_IF
+
+  (* AT 2 IN THE MORNING, CHECK DATE *)
+  IF (TIME = '02:00:00')
+  {
+    CUR_DATE = DATE
+    MONTH = ATOI(LEFT_STRING(CUR_DATE,2))
+    DAY_OF_MONTH = ATOI(MID_STRING(CUR_DATE,4,2))
+    YEAR  = MID_STRING(CUR_DATE,7,4)
+    CUR_DATE = "ITOA(MONTH/10),ITOA(MONTH%10),'-'"
+    CUR_DATE = "CUR_DATE,ITOA(DAY_OF_MONTH/10),ITOA(DAY_OF_MONTH%10),'-'"
+    CUR_DATE = "CUR_DATE,YEAR"
+
+    IF ((DAY = 'SUN') && (MONTH = 3) && (!TIME_CHANGED))
+    { (* CHECK FOR SECOND SUN OF MARCH *)
+      IF ((DAY_OF_MONTH > 7) && (DAY_OF_MONTH < 15))
+      {
+        ON[TIME_CHANGED]
+        SEND_COMMAND 0,"'CLOCK ',CUR_DATE,' 03:00:00'"
+        SEND_STRING 0,"'DLS: CLOCK ',CUR_DATE,' 03:00:00',13,10"
+        WAIT 1200 'DAYLIGHT SAV TC' (* WAIT 2 MINUTES *)
+          OFF[TIME_CHANGED]
+      }
+    }
+    IF ((DAY = 'SUN') && (MONTH = 11) && (!TIME_CHANGED))
+    { (* CHECK FOR FIRST SUN OF NOVEMBER *)
+      DAY_OF_MONTH = DAY_OF_MONTH-7
+      IF (DAY_OF_MONTH = 0 || DAY_OF_MONTH > 65000)
+      {
+        ON[TIME_CHANGED]
+        SEND_COMMAND 0,"'CLOCK ',CUR_DATE,' 01:00:00'"
+        SEND_STRING 0,"'DLS: CLOCK ',CUR_DATE,' 01:00:00',13,10"
+        WAIT 61200 'DAYLIGHT SAV TC' (* WAIT OVER 1 HOUR *)
+          OFF[TIME_CHANGED]
+      }
+    }
+  }
+}
+#END_IF
+
+#IF_NOT_DEFINED __NETLINX__
+DEFINE_CALL 'NEWDST'
+LOCAL_VAR
+CUR_DATE[12]                       (* CURRENT DATE STRING *)
+DAY_OF_MONTH                       (* DAY OF MONTH (INT) *)
+MONTH                              (* MONTH (INT) *)
+TIME_CHANGED                       (* 1 IF TIME WAS CHANGED *)
+{
+(* THE FOLLOWING EXCERPT IS OFFERED AS AN EXPLANATION AND IS FROM:
+   http://www4.law.cornell.edu/uscode/15/260a.html
+   United States Code
+   TITLE 15 - COMMERCE AND TRADE
+   CHAPTER 6 - WEIGHTS AND MEASURES AND STANDARD TIME
+   SUBCHAPTER IX - STANDARD TIME
+   Sec. 260a. Advancement of time or changeover dates
+
+   (a) Duration of period; State exemption
+   During the period commencing at 2 o'clock antemeridian on the first Sunday
+   of April of each year and ending at 2 o'clock antemeridian on the last Sunday
+   of October of each year, the standard time of each zone established by
+   sections 261 to 264 of this of this title, as modified by section 265 of
+   this title, shall be advanced one hour and such time as so advanced shall
+   for the purposes of such sections 261 to 264, as so modified, be the standard
+   time of such zone during such period; however, (1) any State that
+   lies entirely within one time zone may by law exempt itself from the
+   provisions of this subsection providing for the advancement of time,
+   but only if that law provides that the entire State (including all political
+   subdivisions thereof) shall observe the standard time otherwise applicable
+   during that period, and (2) any State with parts thereof in more than one
+   time zone may by law exempt either the entire State as provided in (1) or
+   may exempt the entire area of the State lying within any time zone.
+	 
+	 As prescribed: The Energy Policy Act of 2005 Rule 
+
+		Start: Second Sunday in March 
+
+		End: First Sunday in November 
+
+		Time: 2 am local time 
+
+		Beginning in 2007, Daylight Saving Time is extended one month
+		and the schedule for the states of the United States that adopt daylight saving time will be:
+
+		2 a.m. on the Second Sunday in March to
+		2 a.m. on the First Sunday of November.
+*)
+
+  (* NOTIFY *)
+#IF_DEFINED SYSCALL_NOTIFY
+  WAIT 50
+    SEND_STRING 0,"'IN SYSCALL ',39,'NEWDST',39,13,10"
+#END_IF
+
+  (* AT 2 IN THE MORNING, CHECK DATE *)
+  IF (TIME = '02:00:00')
+  {
+    CUR_DATE = DATE
+    MONTH = ATOI(LEFT_STRING(CUR_DATE,2))
+    DAY_OF_MONTH = ATOI(MID_STRING(CUR_DATE,4,2))
+    IF ((DAY = 'SUN') && (MONTH = 3) && (!TIME_CHANGED))
+    { (* CHECK FOR SECOND SUN OF MARCH *) 
+			IF (DAY_OF_MONTH > 7 && DAY_OF_MONTH < 15)
+      {
+        ON[TIME_CHANGED]
+        SEND_COMMAND 0,"'CLOCK ',DATE,' 03:00:00'"
+        SEND_STRING 0,"'DLS: CLOCK ',DATE,' 03:00:00',13,10"
+        WAIT 1200 'DAYLIGHT SAV TC' (* WAIT 2 MINUTES *)
+          OFF[TIME_CHANGED]
+      }
+    }
+    IF ((DAY = 'SUN') && (MONTH = 11) && (!TIME_CHANGED))
+    { (* CHECK FOR FIRST SUN OF NOVEMBER *)
+			DAY_OF_MONTH = DAY_OF_MONTH-7
+      IF (DAY_OF_MONTH = 0 || DAY_OF_MONTH > 65000)
+      {
+        ON[TIME_CHANGED]
+        SEND_COMMAND 0,"'CLOCK ',DATE,' 01:00:00'"
+        SEND_STRING 0,"'DLS: CLOCK ',DATE,' 01:00:00',13,10"
+        WAIT 60000 'DAYLIGHT SAV TC' (* WAIT OVER 1 HOUR *)
+          OFF[TIME_CHANGED]
+      }
+    }
+  }
+}
+
+#END_IF
+(***********************************************************)
+(*                     END OF PROGRAM                      *)
+(*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)
+(***********************************************************)
