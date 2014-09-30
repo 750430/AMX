@@ -1,7 +1,4 @@
-module_name='Planar PS65 Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev dvDisp)
-(***********************************************************)
-(*  FILE_LAST_MODIFIED_ON: 10/09/2008  AT: 11:25:55        *)
-(***********************************************************)
+module_name='LG 55LW6500 Rev6-00'(dev dvTP[], dev vdvLCD, dev vdvLCD_FB, dev dvLCD)
 (***********************************************************)
 (* System Type : NetLinx                                   *)
 (***********************************************************)
@@ -9,8 +6,8 @@ module_name='Planar PS65 Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev d
 
 (***********************************************************)
 (*   
-	Set baud to 9600,N,8,1,485 DISABLE
-	define_module 'Planar PS65 Rev6-00' lcd1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvDisp)
+	set baud to 9600,N,8,1 485 DISABLE
+	define_module 'LG 55LW6500 Rev6-00' disp1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvLCD1)
 *)
 
 #include 'HoppSNAPI Rev6-00.axi'
@@ -19,27 +16,28 @@ module_name='Planar PS65 Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev d
 (***********************************************************)
 define_constant //Timelines
 
-tlPoll		= 2001
-tlCmd		= 2002
+tlPoll		=	2001
+tlCmd		=	2002
 
 define_constant //Polling
 
-pollPower 	=	1
-pollInput 	=	2
+PollPower	=	1
+PollInput	=	2
 
 (***********************************************************)
 (*               VARIABLE DEFINITIONS GO BELOW             *)
 (***********************************************************)
-define_variable	//Loop Variables
+define_variable //Loop Variables
 
 integer		x
+integer		y
 
-define_variable //Timelines Variables
+define_variable //Timeline Variables
 
-long		lPollArray[]	=	{1500,1500}
-long		lCmdArray[]  	=	{1000,1000}
+long		lPollTime[]={2000,2000}
+long		lCmdArray[]={1000,1000}
 
-integer 	nPollType
+integer		nPollType
 integer		nCmd
 
 define_variable //Active Variables
@@ -49,10 +47,9 @@ integer		nActiveInput
 
 define_variable //Strings
 
-char		cResp[100]
-char 		cCmdStr[40][40]	
-char 		cPollStr[2][40]
-char 		cRespStr[40][40]
+char 		cCmdStr[31][20]	
+char		cRespStr[31][20]
+char		cPollStr[2][20]
 
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)
@@ -62,17 +59,16 @@ define_function tp_fb()
 {
 	for(x=1;x<=length_array(VD_PWR);x++) 
 	{
-		[vdvDisp_FB,VD_PWR[x]]=nActivePower=VD_PWR[x]
+		[vdvLCD_FB,VD_PWR[x]]=nActivePower=VD_PWR[x]
 		[dvTP,VD_PWR[x]]=nActivePower=VD_PWR[x]
 	}
 	
 	for(x=1;x<=length_array(VD_SRC);x++)
 	{
-		[vdvDisp_FB,VD_SRC[x]]=nActiveInput=VD_SRC[x]
+		[vdvLCD_FB,VD_SRC[x]]=nActiveInput=VD_SRC[x]
 		[dvTP,VD_SRC[x]]=nActiveInput=VD_SRC[x]
 	}	
 }
-
 
 define_function cmd_executed()
 {
@@ -89,15 +85,20 @@ define_function start_command_timeline()
 
 define_function parse(char cCompStr[100])
 {
-	for(x=1;x<=length_array(VD_PWR);x++)
+	select
 	{
-		if(find_string(cCompStr,cRespStr[VD_PWR[x]],1))
-		{
-			nActivePower=VD_PWR[x]
-			if(nCmd=VD_PWR[x]) cmd_executed()
+		active(find_string(cCompStr,cRespStr[VD_PWR_ON],1)):
+		{			
+			nActivePower=VD_PWR_ON
+			IF(nCmd = VD_PWR_ON) cmd_executed()
+		}
+		active(find_string(cCompStr,cRespStr[VD_PWR_OFF],1)):
+		{	
+			nActivePower=VD_PWR_OFF
+			IF(nCmd = VD_PWR_OFF) cmd_executed()
 		}
 	}
-		
+	
 	for(x=1;x<=length_array(VD_SRC);x++)
 	{
 		if(find_string(cCompStr,cRespStr[VD_SRC[x]],1))
@@ -108,7 +109,6 @@ define_function parse(char cCompStr[100])
 	}
 }
 
-
 define_function command_to_display()
 {
 	switch(nCmd)
@@ -116,13 +116,13 @@ define_function command_to_display()
 		case VD_PWR_ON:
 		{
 			nActivePower=VD_WARMING
-			send_string dvDisp,"cCmdStr[nCmd]"
+			send_string dvLCD,"cCmdStr[nCmd]"
 			nPollType = pollPower
 		}
 		case VD_PWR_OFF: 
 		{
 			nActivePower=VD_COOLING
-			send_string dvDisp,"cCmdStr[nCmd]"
+			send_string dvLCD,"cCmdStr[nCmd]"
 			nPollType = pollPower
 		}
 		case VD_SRC_VGA1:
@@ -151,13 +151,13 @@ define_function command_to_display()
 			{
 				case VD_PWR_ON:
 				{
-					send_string dvDisp,"cCmdStr[nCmd]"
+					send_string dvLCD,"cCmdStr[nCmd]"
 					nPollType = pollInput
 				}
 				case VD_PWR_OFF:
 				{
 					nActivePower=VD_WARMING
-					send_string dvDisp,"cCmdStr[VD_PWR_ON]"
+					send_string dvLCD,"cCmdStr[VD_PWR_ON]"
 					nPollType = pollPower
 				}
 				default:
@@ -168,43 +168,58 @@ define_function command_to_display()
 		}
 		default:
 		{
-			if(nCmd) send_string dvDisp,"cCmdStr[nCmd]"
+			if(nCmd) send_string dvLCD,"cCmdStr[nCmd]"
 			cmd_executed()
 		}
 	}	
 }
-
 (***********************************************************)
 (*                STARTUP CODE GOES BELOW                  *)
 (***********************************************************)
 define_start //Set All Strings
 
-cCmdStr[VD_PWR_ON]			= "$38,$30,$31,$73,$21,$30,$30,$31,$0D"		//on
-cCmdStr[VD_PWR_OFF]			= "$38,$30,$31,$73,$21,$30,$30,$30,$0D"		//off
-cCmdStr[VD_SRC_DVI1] 		= "$38,$30,$31,$73,$22,$30,$30,$36,$0D"
-cCmdStr[VD_SRC_HDMI1]		= "$38,$30,$31,$73,$22,$30,$30,$31,$0D"
-cCmdStr[VD_SRC_VGA1]		= "$38,$30,$31,$73,$22,$30,$30,$30,$0D"
+cCmdStr[VD_PWR_ON]		=	"'ka 1 1',$0D"
+cCmdStr[VD_PWR_OFF]		=	"'ka 1 0',$0D"
 
-cPollStr[pollPower]		=	"$38,$30,$31,$67,$6C,$30,$30,$30,$0D"		//pwr
-cPollStr[pollInput] 	=	"$38,$30,$31,$67,$6A,$30,$30,$30,$0D"		//input
+cCmdStr[VD_SRC_CATV]	=	"'xb 1 01',$0D"
+cCmdStr[VD_SRC_VID]		=	"'xb 1 20',$0D"
+cCmdStr[VD_SRC_CMPNT]	=	"'xb 1 40',$0D"
+cCmdStr[VD_SRC_AUX1]	=	"'xb 1 41',$0D" //Component 2
+cCmdStr[VD_SRC_AUX2]	=	"'xb 1 42',$0D" //Component 3
+cCmdStr[VD_SRC_RGB1]	=	"'xb 1 60',$0D"
+cCmdStr[VD_SRC_HDMI1]	=	"'xb 1 90',$0D"
+cCmdStr[VD_SRC_HDMI2]	=	"'xb 1 91',$0D"
+cCmdStr[VD_SRC_HDMI3]	=	"'xb 1 92',$0D"
+cCmdStr[VD_SRC_HDMI4]	=	"'xb 1 93',$0D"
 
-cRespStr[VD_PWR_ON] 		= "$38,$30,$31,$72,$6C,$30,$30,$31,$0D"
-cRespStr[VD_PWR_OFF]		= "$38,$30,$31,$72,$6C,$30,$30,$30,$0D"
-cRespStr[VD_SRC_DVI1] 		= "$38,$30,$31,$72,$6A,$30,$30,$36,$0D"
-cRespStr[VD_SRC_HDMI1]		= "$38,$30,$31,$72,$6A,$30,$30,$31,$0D"
-cRespStr[VD_SRC_VGA1]		= "$38,$30,$31,$72,$6A,$30,$30,$30,$0D"
+cRespStr[VD_PWR_ON]		=	"'a 01 OK01x'"
+cRespStr[VD_PWR_OFF]	=	"'a 01 OK00x'"
 
-define_start //Timelines and Feedback
+cRespStr[VD_SRC_CATV]	=	"'b 01 OK01x'"
+cRespStr[VD_SRC_VID]	=	"'b 01 OK20x'"
+cRespStr[VD_SRC_CMPNT]	=	"'b 01 OK40x'"
+cRespStr[VD_SRC_AUX1]	=	"'b 01 OK41x'" //Component 2
+cRespStr[VD_SRC_AUX2]	=	"'b 01 OK42x'" //Component 3
+cRespStr[VD_SRC_RGB1]	=	"'b 01 OK60x'"
+cRespStr[VD_SRC_HDMI1]	=	"'b 01 OK90x'"
+cRespStr[VD_SRC_HDMI2]	=	"'b 01 OK91x'"
+cRespStr[VD_SRC_HDMI3]	=	"'b 01 OK92x'"
+cRespStr[VD_SRC_HDMI4]	=	"'b 01 OK93x'"
 
-timeline_create(tlPoll,lPollArray,length_array(lPollArray),TIMELINE_RELATIVE,TIMELINE_REPEAT)
+cPollStr[PollPower]		=	"'ka 1 FF',$0D"
+cPollStr[PollInput]		=	"'xb 1 FF',$0D"
 
-#INCLUDE 'HoppFB Rev6-00'
+define_start
+
+timeline_create(tlPoll,lPollTime,max_length_array(lPollTime),timeline_relative,timeline_repeat)
+
+#include 'HoppFB Rev6-00'
 (***********************************************************)
 (*                THE EVENTS GO BELOW                      *)
 (***********************************************************)
-define_event  //Parse Response
+define_event
 
-data_event[dvDisp]
+data_event[dvLCD]
 {
 	string:
 	{
@@ -213,23 +228,21 @@ data_event[dvDisp]
 		local_var char cBuff[255]
 		stack_var integer nPos	
 		
-		//parse(data.text)
-		
 		cBuff = "cBuff,data.text"
 		while(length_string(cBuff))
 		{
 			select
 			{
-				active(find_string(cBuff,"$0D",1)&& length_string(cHold)):
+				active(find_string(cBuff,"'x'",1)&& length_string(cHold)):
 				{
-					nPos=find_string(cBuff,"$0D",1)
+					nPos=find_string(cBuff,"'x'",1)
 					cFullStr="cHold,get_buffer_string(cBuff,nPos)"
 					parse(cFullStr)
 					cHold=''
 				}
-				active(find_string(cBuff,"$0D",1)):
+				active(find_string(cBuff,"'x'",1)):
 				{
-					nPos=find_string(cBuff,"$0D",1)
+					nPos=find_string(cBuff,"'x'",1)
 					cFullStr=get_buffer_string(cBuff,nPos)
 					parse(cFullStr)
 				}
@@ -239,13 +252,11 @@ data_event[dvDisp]
 					cBuff=''
 				}
 			}
-		}	
+		}
 	}
 }
 
-define_event //Input
-
-channel_event[vdvDisp,0]
+channel_event[vdvLCD,0]
 {
 	on:
 	{
@@ -260,17 +271,14 @@ button_event[dvTP,0]
 	push:
 	{
 		to[button.input]
-		to[vdvDisp,button.input.channel]
+		pulse[vdvLCD,button.input.channel]
 	}
 }
-
-define_event //Timelines
 
 timeline_event[tlPoll]		//Display Polling
 {	
 	nPollType = timeline.sequence
-	send_string dvDisp,"cPollStr[nPollType]"
-	
+	send_string dvLCD,cPollStr[nPollType]
 }
 
 timeline_event[tlCmd]		//Display Commands
@@ -279,7 +287,7 @@ timeline_event[tlCmd]		//Display Commands
 	{
 		case 1:	//1st time
 		{
-			if(nPollType) send_string dvDisp,"cPollStr[nPollType]"
+			if(nPollType) send_string dvLCD,cPollStr[nPollType]
 		}
 		case 2:	//2nd time
 		{
@@ -292,8 +300,7 @@ timeline_event[tlCmd]		//Display Commands
 (***********************************************************)
 (*            THE ACTUAL PROGRAM GOES BELOW                *)
 (***********************************************************)
-DEFINE_PROGRAM
-
+define_program
 
 (***********************************************************)
 (*                     END OF PROGRAM                      *)

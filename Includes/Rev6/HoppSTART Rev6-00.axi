@@ -99,8 +99,9 @@ define_function reconnect_client(integer nVal)
 define_function biamp_recall_preset(char cPreset[])
 {
 	send_string dvBiamp,"'RECALL 0 PRESET ',cPreset,10"
-	wait 5
-	query_mixer()
+//	wait 5
+//	query_mixer()
+//JDM Add mIx Query All Here
 }
 #END_IF
 

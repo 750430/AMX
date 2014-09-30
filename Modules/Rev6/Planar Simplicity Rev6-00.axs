@@ -1,7 +1,4 @@
-module_name='Planar PS65 Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev dvDisp)
-(***********************************************************)
-(*  FILE_LAST_MODIFIED_ON: 10/09/2008  AT: 11:25:55        *)
-(***********************************************************)
+module_name='Planar Simplicity Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev dvDisp)
 (***********************************************************)
 (* System Type : NetLinx                                   *)
 (***********************************************************)
@@ -9,8 +6,8 @@ module_name='Planar PS65 Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev d
 
 (***********************************************************)
 (*   
-	Set baud to 9600,N,8,1,485 DISABLE
-	define_module 'Planar PS65 Rev6-00' lcd1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvDisp)
+	set baud to 9600,N,8,1 485 DISABLE
+	define_module 'Planar Simplicity Rev6-00' disp1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvDisp1)
 *)
 
 #include 'HoppSNAPI Rev6-00.axi'
@@ -19,27 +16,28 @@ module_name='Planar PS65 Rev6-00'(dev dvTP[], dev vdvDisp, dev vdvDisp_FB, dev d
 (***********************************************************)
 define_constant //Timelines
 
-tlPoll		= 2001
-tlCmd		= 2002
+tlPoll		=	2001
+tlCmd		=	2002
 
 define_constant //Polling
 
-pollPower 	=	1
-pollInput 	=	2
+PollPower	=	1
+PollInput	=	2
 
 (***********************************************************)
 (*               VARIABLE DEFINITIONS GO BELOW             *)
 (***********************************************************)
-define_variable	//Loop Variables
+define_variable //Loop Variables
 
 integer		x
+integer		y
 
-define_variable //Timelines Variables
+define_variable //Timeline Variables
 
-long		lPollArray[]	=	{1500,1500}
-long		lCmdArray[]  	=	{1000,1000}
+long		lPollArray[]={2000,2000}
+long		lCmdArray[]={1000,1000}
 
-integer 	nPollType
+integer		nPollType
 integer		nCmd
 
 define_variable //Active Variables
@@ -49,10 +47,9 @@ integer		nActiveInput
 
 define_variable //Strings
 
-char		cResp[100]
-char 		cCmdStr[40][40]	
-char 		cPollStr[2][40]
-char 		cRespStr[40][40]
+char 		cCmdStr[31][20]	
+char		cRespStr[31][20]
+char		cPollStr[2][20]
 
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)
@@ -73,7 +70,6 @@ define_function tp_fb()
 	}	
 }
 
-
 define_function cmd_executed()
 {
 	ncmd=0
@@ -89,23 +85,34 @@ define_function start_command_timeline()
 
 define_function parse(char cCompStr[100])
 {
-	for(x=1;x<=length_array(VD_PWR);x++)
+	select
 	{
-		if(find_string(cCompStr,cRespStr[VD_PWR[x]],1))
-		{
-			nActivePower=VD_PWR[x]
-			if(nCmd=VD_PWR[x]) cmd_executed()
+		active(find_string(cCompStr,cRespStr[VD_PWR_ON],1)):
+		{			
+			nActivePower=VD_PWR_ON
+			IF(nCmd = VD_PWR_ON) cmd_executed()
 		}
-	}
-		
-	for(x=1;x<=length_array(VD_SRC);x++)
-	{
-		if(find_string(cCompStr,cRespStr[VD_SRC[x]],1))
-		{
-			nActiveInput=VD_SRC[x]
-			if(nCmd=VD_SRC[x]) cmd_executed()
+		active(find_string(cCompStr,cRespStr[VD_PWR_OFF],1)):
+		{	
+			nActivePower=VD_PWR_OFF
+			IF(nCmd = VD_PWR_OFF) cmd_executed()
 		}
-	}
+		active(find_string(cCompStr,cRespStr[VD_SRC_DVI1],1)):
+		{
+			nActiveInput=VD_SRC_DVI1
+			IF(ncmd = VD_SRC_DVI1) cmd_executed()
+		}
+		active(find_string(cCompStr,cRespStr[VD_SRC_VGA1],1)):
+		{
+			nActiveInput=VD_SRC_VGA1
+			IF(ncmd = VD_SRC_VGA1) cmd_executed()
+		}
+		active(find_string(cCompStr,cRespStr[VD_SRC_HDMI1],1)):
+		{
+			nActiveInput=VD_SRC_HDMI1
+			IF(ncmd = VD_SRC_HDMI1) cmd_executed()
+		}
+	}	
 }
 
 
@@ -173,73 +180,41 @@ define_function command_to_display()
 		}
 	}	
 }
-
 (***********************************************************)
 (*                STARTUP CODE GOES BELOW                  *)
 (***********************************************************)
 define_start //Set All Strings
 
-cCmdStr[VD_PWR_ON]			= "$38,$30,$31,$73,$21,$30,$30,$31,$0D"		//on
-cCmdStr[VD_PWR_OFF]			= "$38,$30,$31,$73,$21,$30,$30,$30,$0D"		//off
-cCmdStr[VD_SRC_DVI1] 		= "$38,$30,$31,$73,$22,$30,$30,$36,$0D"
-cCmdStr[VD_SRC_HDMI1]		= "$38,$30,$31,$73,$22,$30,$30,$31,$0D"
-cCmdStr[VD_SRC_VGA1]		= "$38,$30,$31,$73,$22,$30,$30,$30,$0D"
+cCmdStr[VD_PWR_ON]		=	"$A6,$01,$00,$00,$00,$04,$01,$18,$02,$B8"
+cCmdStr[VD_PWR_OFF]		=	"$A6,$01,$00,$00,$00,$04,$01,$18,$01,$BB"
+cCmdStr[VD_SRC_HDMI1]	=	"$A6,$01,$00,$00,$00,$07,$01,$AC,$09,$00,$00,$00,$04"
+cCmdStr[VD_SRC_DVI1]	=	"$A6,$01,$00,$00,$00,$07,$01,$AC,$09,$00,$00,$00,$0E"
+cCmdStr[VD_SRC_VGA1]	=	"$A6,$01,$00,$00,$00,$07,$01,$AC,$05,$00,$00,$00,$08"
 
-cPollStr[pollPower]		=	"$38,$30,$31,$67,$6C,$30,$30,$30,$0D"		//pwr
-cPollStr[pollInput] 	=	"$38,$30,$31,$67,$6A,$30,$30,$30,$0D"		//input
+cRespStr[VD_PWR_ON]		=	"$21,$01,$00,$00,$04,$01,$19,$02,$3E"
+cRespStr[VD_PWR_OFF]	=	"$21,$01,$00,$00,$04,$01,$19,$01,$3D"
+cRespStr[VD_SRC_HDMI1]	=	"$21,$01,$00,$00,$05,$01,$AD,$FD,$0A,$7E"
+cRespStr[VD_SRC_DVI1]	=	"$21,$01,$00,$00,$05,$01,$AD,$FD,$0B,$7F"
+cRespStr[VD_SRC_VGA1]	=	"$21,$01,$00,$00,$05,$01,$AD,$FD,$08,$DA"
 
-cRespStr[VD_PWR_ON] 		= "$38,$30,$31,$72,$6C,$30,$30,$31,$0D"
-cRespStr[VD_PWR_OFF]		= "$38,$30,$31,$72,$6C,$30,$30,$30,$0D"
-cRespStr[VD_SRC_DVI1] 		= "$38,$30,$31,$72,$6A,$30,$30,$36,$0D"
-cRespStr[VD_SRC_HDMI1]		= "$38,$30,$31,$72,$6A,$30,$30,$31,$0D"
-cRespStr[VD_SRC_VGA1]		= "$38,$30,$31,$72,$6A,$30,$30,$30,$0D"
+cPollStr[PollPower]		=	"$A6,$01,$00,$00,$00,$03,$01,$19,$BC"
+cPollStr[PollInput]		=	"$A6,$01,$00,$00,$00,$03,$01,$AD,$08"
 
 define_start //Timelines and Feedback
 
-timeline_create(tlPoll,lPollArray,length_array(lPollArray),TIMELINE_RELATIVE,TIMELINE_REPEAT)
+timeline_create(tlPoll,lPollArray,max_length_array(lPollArray),timeline_relative,timeline_repeat)
 
-#INCLUDE 'HoppFB Rev6-00'
+#include 'HoppFB Rev6-00'
 (***********************************************************)
 (*                THE EVENTS GO BELOW                      *)
 (***********************************************************)
-define_event  //Parse Response
+define_event //Parse Response
 
 data_event[dvDisp]
 {
 	string:
 	{
-		local_var char cHold[100]
-		local_var char cFullStr[100]
-		local_var char cBuff[255]
-		stack_var integer nPos	
-		
-		//parse(data.text)
-		
-		cBuff = "cBuff,data.text"
-		while(length_string(cBuff))
-		{
-			select
-			{
-				active(find_string(cBuff,"$0D",1)&& length_string(cHold)):
-				{
-					nPos=find_string(cBuff,"$0D",1)
-					cFullStr="cHold,get_buffer_string(cBuff,nPos)"
-					parse(cFullStr)
-					cHold=''
-				}
-				active(find_string(cBuff,"$0D",1)):
-				{
-					nPos=find_string(cBuff,"$0D",1)
-					cFullStr=get_buffer_string(cBuff,nPos)
-					parse(cFullStr)
-				}
-				active(1):
-				{
-					cHold="cHold,cBuff"
-					cBuff=''
-				}
-			}
-		}	
+		parse(data.text)
 	}
 }
 
@@ -260,7 +235,7 @@ button_event[dvTP,0]
 	push:
 	{
 		to[button.input]
-		to[vdvDisp,button.input.channel]
+		pulse[vdvDisp,button.input.channel]
 	}
 }
 
@@ -269,8 +244,7 @@ define_event //Timelines
 timeline_event[tlPoll]		//Display Polling
 {	
 	nPollType = timeline.sequence
-	send_string dvDisp,"cPollStr[nPollType]"
-	
+	send_string dvDisp,cPollStr[nPollType]
 }
 
 timeline_event[tlCmd]		//Display Commands
@@ -279,7 +253,7 @@ timeline_event[tlCmd]		//Display Commands
 	{
 		case 1:	//1st time
 		{
-			if(nPollType) send_string dvDisp,"cPollStr[nPollType]"
+			if(nPollType) send_string dvDisp,cPollStr[nPollType]
 		}
 		case 2:	//2nd time
 		{
@@ -292,8 +266,7 @@ timeline_event[tlCmd]		//Display Commands
 (***********************************************************)
 (*            THE ACTUAL PROGRAM GOES BELOW                *)
 (***********************************************************)
-DEFINE_PROGRAM
-
+define_program
 
 (***********************************************************)
 (*                     END OF PROGRAM                      *)

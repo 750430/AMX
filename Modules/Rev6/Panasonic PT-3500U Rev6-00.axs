@@ -1,4 +1,4 @@
-MODULE_NAME='Panasonic PT-3500U Rev6-00'(DEV dvTP, DEV vdvProj, dev vdvProj_FB, DEV dvProj)
+module_name='Panasonic PT-3500U Rev6-00'(DEV dvTP[], DEV vdvDisp, dev vdvDisp_FB, DEV dvDisp)
 (***********************************************************)
 (*  FILE_LAST_MODIFIED_ON: 10/09/2008  AT: 11:25:55        *)
 (***********************************************************)
@@ -9,70 +9,53 @@ MODULE_NAME='Panasonic PT-3500U Rev6-00'(DEV dvTP, DEV vdvProj, dev vdvProj_FB, 
 (*   
 	Set baud to 19200,N,8,1,485 DISABLE
 	Baud Rate is selectable
-	define_module 'Panasonic PT-3500U Rev6-00' proj1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvProj)
+	define_module 'Panasonic PT-3500U Rev6-00' proj1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvDisp)
 *)
 
-#INCLUDE 'HoppSNAPI Rev6-00.axi'
-
-(***********************************************************)
-(*          DEVICE NUMBER DEFINITIONS GO BELOW             *)
-(***********************************************************)
-DEFINE_DEVICE
-
+#include 'HoppSNAPI Rev6-00.axi'
 (***********************************************************)
 (*               CONSTANT DEFINITIONS GO BELOW             *)
 (***********************************************************)
-DEFINE_CONSTANT
+define_constant //Timelines
 
-LONG tlPoll		= 2001
-LONG tlCmd         = 2002
+tlPoll		=	2001
+tlCmd		=	2002
 
-INTEGER PollPower 	= 1
-INTEGER PollInput 	= 2
-INTEGER PollMute 	= 3
-INTEGER PollLamp	= 4
+define_constant //Polling
 
-(***********************************************************)
-(*              DATA TYPE DEFINITIONS GO BELOW             *)
-(***********************************************************)
-DEFINE_TYPE
+PollPower	= 1
+PollInput	= 2
+PollMute 	= 3
+PollLamp	= 4
 
 (***********************************************************)
 (*               VARIABLE DEFINITIONS GO BELOW             *)
 (***********************************************************)
-DEFINE_VARIABLE
+define_variable //Loop Variables
 
-LONG lPollArray[]	= {1500,1500,1500,1500}
-LONG lCmdArray[]  =	{500,500}
+integer		x
 
-INTEGER nPollType
+define_variable //Timeline Variables
 
-CHAR cResp[100]
-CHAR cCmdStr[52][20]	
-CHAR cPollStr[4][20]
-CHAR cRespStr[52][20]
+long		lPollArray[]	={1500,1500,1500,1500}
+long 		lCmdArray[]  	={500,500}
 
-integer nProjOnFB
-integer nProjOffFB
+integer		nPollType
+integer		nCmd
 
-integer x
-
-INTEGER nPwrVerify = 0
+define_variable //Active Variables
 
 integer		nActivePower
 integer		nActiveInput
 integer		nActiveMute
 integer 	nActiveLampHours
 
-INTEGER nCmd = 0
+define_variable //Strings
 
-define_variable //Channel Arrays
-
-integer		nPower[]={VD_PWR_ON,VD_PWR_OFF,VD_WARMING,VD_COOLING}
-integer		nInput[]={VD_SRC_VGA1,VD_SRC_VGA2,VD_SRC_VGA3,VD_SRC_DVI1,VD_SRC_DVI2,VD_SRC_DVI3,VD_SRC_RGB1,VD_SRC_RGB2,VD_SRC_RGB3,
-						VD_SRC_HDMI1,VD_SRC_HDMI2,VD_SRC_HDMI3,VD_SRC_HDMI4,VD_SRC_VID,VD_SRC_SVID,VD_SRC_CMPNT,VD_SRC_CATV,
-						VD_SRC_AUX1,VD_SRC_AUX2,VD_SRC_AUX3,VD_SRC_AUX4}
-integer		nMute[]={VD_MUTE_ON,VD_MUTE_OFF}
+char 		cResp[100]
+char 		cCmdStr[52][20]	
+char 		cPollStr[4][20]
+char 		cRespStr[52][20]
 
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)
@@ -80,26 +63,28 @@ integer		nMute[]={VD_MUTE_ON,VD_MUTE_OFF}
 
 define_function tp_fb()
 {
-	for(x=1;x<=length_array(nPower);x++) 
+	for(x=1;x<=length_array(VD_PWR);x++) 
 	{
-		[vdvProj_FB,nPower[x]]=nActivePower=nPower[x]
-		[dvTP,nPower[x]]=nActivePower=nPower[x]
+		[vdvDisp_FB,VD_PWR[x]]=nActivePower=VD_PWR[x]
+		[dvTP,VD_PWR[x]]=nActivePower=VD_PWR[x]
 	}
 	
-	for(x=1;x<=length_array(nInput);x++)
+	for(x=1;x<=length_array(VD_SRC);x++)
 	{
-		[vdvProj_FB,nInput[x]]=nActiveInput=nInput[x]
-		[dvTP,nInput[x]]=nActiveInput=nInput[x]
+		[vdvDisp_FB,VD_SRC[x]]=nActiveInput=VD_SRC[x]
+		[dvTP,VD_SRC[x]]=nActiveInput=VD_SRC[x]
+	}	
+
+	for(x=1;x<=length_array(VD_MUTE);x++)
+	{
+		[vdvDisp_FB,VD_MUTE[x]]=nActiveMute=VD_MUTE[x]
+		[dvTP,VD_MUTE[x]]=nActiveMute=VD_MUTE[x]
 	}	
 	
-	for(x=1;x<=length_array(nMute);x++)
-	{
-		[vdvProj_FB,nMute[x]]=nActiveMute=nMute[x]
-		[dvTP,nMute[x]]=nActiveMute=nMute[x]
-	}	
+	[vdvDisp_FB,VD_MUTE_TOG]=nActiveMute=VD_MUTE_ON
 }
 
-DEFINE_FUNCTION CmdExecuted()
+define_function cmd_executed()
 {
 	ncmd=0
 	if(timeline_active(tlCmd)) timeline_kill(tlCmd)
@@ -112,41 +97,39 @@ define_function start_command_timeline()
 	wait 1 if(!timeline_active(tlCmd))timeline_create(tlCmd,lCmdArray,2,TIMELINE_RELATIVE,TIMELINE_REPEAT)
 }
 
-DEFINE_FUNCTION Parse(CHAR cCompStr[100])
+define_function parse(CHAR cCompStr[100])
 {
-	STACK_VAR INTEGER x 
-	STACK_VAR INTEGER nLamp
 	switch(nPollType)
 	{
 		case PollPower:
 		{
-			SELECT
+			select
 			{
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_PWR_ON],1)):
+				active(find_string(cCompStr,cRespStr[VD_PWR_ON],1)):
 				{			
-					IF(nActivePower=VD_PWR_OFF) 
+					if(nActivePower=VD_PWR_OFF) 
 					{
-						if(nCmd=VD_PWR_ON) CmdExecuted()
+						if(nCmd=VD_PWR_ON) cmd_executed()
 						nActivePower=VD_WARMING
 						wait 200 nActivePower=VD_PWR_ON
 					}
 					else if (nActivePower<>VD_WARMING)
 					{	
-						if(nCmd=VD_PWR_ON) CmdExecuted()
+						if(nCmd=VD_PWR_ON) cmd_executed()
 						nActivePower=VD_PWR_ON
 					}
 				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_PWR_OFF],1)):
+				active(find_string(cCompStr,cRespStr[VD_PWR_OFF],1)):
 				{	
-					IF(nActivePower=VD_PWR_ON)
+					if(nActivePower=VD_PWR_ON)
 					{
-						if(nCmd=VD_PWR_OFF) CmdExecuted()
+						if(nCmd=VD_PWR_OFF) cmd_executed()
 						nActivePower=VD_COOLING
 						wait 600 nActivePower=VD_PWR_OFF
 					}
 					else if (nActivePower<>VD_COOLING)
 					{
-						if(nCmd=VD_PWR_OFF) CmdExecuted()
+						if(nCmd=VD_PWR_OFF) cmd_executed()
 						nActivePower=VD_PWR_OFF
 					}
 				}
@@ -154,53 +137,23 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 		}
 		case PollInput:
 		{
-			select
+			for(x=1;x<=length_array(VD_SRC);x++)
 			{
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_SRC_RGB1],1)):
+				if(find_string(cCompStr,cRespStr[VD_SRC[x]],1))
 				{
-					nActiveInput=VD_SRC_RGB1
-					if (nCmd=VD_SRC_RGB1) CmdExecuted()
+					nActiveInput=VD_SRC[x]
+					if(nCmd=VD_SRC[x]) cmd_executed()
 				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_SRC_VID],1)):
-				{
-					nActiveInput=VD_SRC_VID
-					if (nCmd=VD_SRC_VID) CmdExecuted()
-				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_SRC_VGA1],1)):
-				{
-					nActiveInput=VD_SRC_VGA1
-					if (nCmd=VD_SRC_VGA1) CmdExecuted()
-				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_SRC_SVID],1)):
-				{
-					nActiveInput=VD_SRC_SVID
-					if (nCmd=VD_SRC_SVID) CmdExecuted()
-				}	
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_SRC_DVI1],1)):
-				{
-					nActiveInput=VD_SRC_DVI1
-					if (nCmd=VD_SRC_DVI1) CmdExecuted()
-				}	
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_SRC_AUX1],1)):
-				{
-					nActiveInput=VD_SRC_AUX1
-					if (nCmd=VD_SRC_AUX1) CmdExecuted()
-				}	
 			}
 		}
 		case PollMute:
 		{
-			select
+			for(x=1;x<=length_array(VD_MUTE);x++)
 			{
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_MUTE_ON],1)):
+				if(find_string(cCompStr,cRespStr[VD_MUTE[x]],1))
 				{
-					nActiveMute=VD_MUTE_ON
-					IF(nCmd = VD_MUTE_ON) CmdExecuted()
-				}
-				ACTIVE(FIND_STRING(cCompStr,cRespStr[VD_MUTE_OFF],1)):
-				{
-					nActiveMute=VD_MUTE_OFF
-					IF(nCmd = VD_MUTE_OFF) CmdExecuted()
+					nActiveMute=VD_MUTE[x]
+					if(nCmd=VD_MUTE[x]) cmd_executed()
 				}
 			}
 		}
@@ -220,7 +173,7 @@ define_function command_to_display()
 		case VD_PWR_ON:
 		case VD_PWR_OFF: 
 		{
-			send_string dvProj,"cCmdStr[nCmd]"
+			send_string dvDisp,"cCmdStr[nCmd]"
 			nPollType = pollPower
 		}
 		case VD_SRC_VGA1:
@@ -249,13 +202,13 @@ define_function command_to_display()
 			{
 				case VD_PWR_ON:
 				{
-					send_string dvProj,"cCmdStr[nCmd]"
+					send_string dvDisp,"cCmdStr[nCmd]"
 					nPollType = pollInput
 				}
 				case VD_PWR_OFF:
 				case VD_COOLING:
 				{
-					send_string dvProj,"cCmdStr[VD_PWR_ON]"
+					send_string dvDisp,"cCmdStr[VD_PWR_ON]"
 					nPollType = pollPower
 				}
 				case VD_WARMING:
@@ -268,14 +221,14 @@ define_function command_to_display()
 		case VD_MUTE_ON:
 		case VD_MUTE_OFF:
 		{
-			if(nActiveMute<>nCmd) send_string dvProj,"cCmdStr[nCmd]"
-			else CmdExecuted()
+			if(nActiveMute<>nCmd) send_string dvDisp,"cCmdStr[nCmd]"
+			else cmd_executed()
 			nPollType=pollMute
 		}
 		default:
 		{
-			if(nCmd) send_string dvProj,"cCmdStr[nCmd]"
-			CmdExecuted()
+			if(nCmd) send_string dvDisp,"cCmdStr[nCmd]"
+			cmd_executed()
 		}
 	}	
 }
@@ -283,7 +236,7 @@ define_function command_to_display()
 (***********************************************************)
 (*                STARTUP CODE GOES BELOW                  *)
 (***********************************************************)
-DEFINE_START
+define_start //Set All Strings
 
 cCmdStr[VD_PWR_ON]			= "$02,'ADZZ;PON',$03"	//on
 cCmdStr[VD_PWR_OFF]			= "$02,'ADZZ;POF',$03"	//off
@@ -321,9 +274,9 @@ timeline_create(tlPoll,lPollArray,length_array(lPollArray),TIMELINE_RELATIVE,TIM
 (***********************************************************)
 (*                THE EVENTS GO BELOW                      *)
 (***********************************************************)
-DEFINE_EVENT
+define_event //Parse Response
 
-data_event[dvProj]
+data_event[dvDisp]
 {
 	string:
 	{
@@ -334,7 +287,6 @@ data_event[dvProj]
 		
 		//parse(data.text)
 		
-		//send_string vdvProj,"'String From: ',data.text,$0D"
 		cBuff = "cBuff,data.text"
 		while(length_string(cBuff))
 		{
@@ -363,16 +315,39 @@ data_event[dvProj]
 	}
 }
 
-TIMELINE_EVENT[tlPoll]				//Projector Polling
+define_event //Input
+
+channel_event[vdvDisp,0]
 {
+	on:
+	{
+		nCmd=channel.channel
+		command_to_display()
+		if(nCmd) start_command_timeline()
+	}
+}
+
+button_event[dvTP,0]
+{
+	push:
+	{
+		to[button.input]
+		pulse[vdvDisp,button.input.channel]
+	}
+}
+
+define_event //Timelines
+
+timeline_event[tlPoll]				//Projector Polling
+{
+	nPollType=timeline.sequence
 	switch(timeline.sequence)
 	{
-		case PollPower: SEND_STRING dvProj,"cPollStr[TIMELINE.SEQUENCE]"
+		case PollPower: send_string dvDisp,"cPollStr[timeline.sequence]"
 		case PollMute:
 		case PollLamp:
-		case PollInput: if (nActivePower=VD_PWR_ON) SEND_STRING dvProj,"cPollStr[TIMELINE.SEQUENCE]"
+		case PollInput: if (nActivePower=VD_PWR_ON) send_string dvDisp,"cPollStr[timeline.sequence]"
 	}
-	nPollType = TIMELINE.SEQUENCE
 }
 
 timeline_event[tlCmd]		//Display Commands
@@ -381,7 +356,7 @@ timeline_event[tlCmd]		//Display Commands
 	{
 		case 1:	//1st time
 		{
-			if(nPollType) send_string dvProj,"cPollStr[nPollType]"
+			if(nPollType) send_string dvDisp,"cPollStr[nPollType]"
 		}
 		case 2:	//2nd time
 		{
@@ -391,29 +366,10 @@ timeline_event[tlCmd]		//Display Commands
 	}
 }
 
-CHANNEL_EVENT[vdvProj,0]
-{
-	ON:
-	{
-		nCmd=channel.channel
-		command_to_display()
-		start_command_timeline()
-	}
-}
-
-BUTTON_EVENT[dvTP,0]
-{
-	PUSH:
-	{
-		to[button.input]
-		to[vdvProj,button.input.channel]
-	}
-}
-
 (***********************************************************)
 (*            THE ACTUAL PROGRAM GOES BELOW                *)
 (***********************************************************)
-DEFINE_PROGRAM
+define_program
 (***********************************************************)
 (*                     END OF PROGRAM                      *)
 (*        DO NOT PUT ANY CODE BELOW THIS COMMENT           *)

@@ -87,6 +87,8 @@ VD_ASPECT4     		=	48 	//Momentary: Aspect Ratio 4
 VD_MUTE_TOG    		=	49 	//Toggle: Video Mute On/Off
 VD_MUTE_ON			=	50 	//Momentary: Video Mute On
 VD_MUTE_OFF    		=	51 	//Momentary: Video Mute Off
+integer VD_MUTE[]	=	{50,51}
+
 VD_PCADJ			=	52 	//Momentary: Image adjust
 VD_ZOOM_IN			=	53 	//Ramping: Zoom In
 VD_ZOOM_OUT			=	54 	//Ramping: Zoom Out
