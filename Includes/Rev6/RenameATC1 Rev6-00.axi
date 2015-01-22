@@ -19,12 +19,12 @@ define_function update_speeddial1()
 	{
 		if(length_string(sdATC1[x].number)>0)
 		{
-			send_command dvTP_ATC[1],"'^TXT-',itoa(ATC_SPEEDDIAL[x]),',0,',sdATC1[x].name"
+			send_command dvTP_ATC[1],"'^TXT-',itoa(ATC_SPEEDDIALNAME[x]),',0,',sdATC1[x].name"
 			send_command dvTP_ATC[1],"'^TXT-',itoa(ATC_SPEEDDIALNUM[x]),',0,',sdATC1[x].number"
 		}
 		else
 		{
-			send_command dvTP_ATC[1],"'^TXT-',itoa(ATC_SPEEDDIAL[x]),',0,Touch to set Speed Dial'"
+			send_command dvTP_ATC[1],"'^TXT-',itoa(ATC_SPEEDDIALNAME[x]),',0,Touch to set Speed Dial'"
 			send_command dvTP_ATC[1],"'^TXT-',itoa(ATC_SPEEDDIALNUM[x]),',0, '"
 		}
 	}	
@@ -85,7 +85,7 @@ channel_event[vdvRenaming,0]
 }
 
 
-button_event[dvTP_ATC[1],ATC_SPEEDDIAL]
+button_event[dvTP_ATC[1],ATC_SPEEDDIALNAME]
 {
 	push:
 	{
@@ -93,19 +93,19 @@ button_event[dvTP_ATC[1],ATC_SPEEDDIAL]
 	}
 	hold[15]:
 	{
-		nSetSpeedDial1Name=get_last(ATC_SPEEDDIAL)
+		nSetSpeedDial1Name=get_last(ATC_SPEEDDIALNAME)
 		send_command button.input.device,"'@AKB-',sdATC1[nSetSpeedDial1Name].name,';Input Speed Dial Name;;AKB-;1'" //Pop up the keypad so the user can input a speed dial number
 	}
 	release:
 	{
 		if(!nSetSpeedDial1Name)
 		{
-			if(length_array(sdATC1[get_last(ATC_SPEEDDIAL)].number)=0)
+			if(length_array(sdATC1[get_last(ATC_SPEEDDIALNAME)].number)=0)
 			{
-				nSetSpeedDial1Name=get_last(ATC_SPEEDDIAL)
+				nSetSpeedDial1Name=get_last(ATC_SPEEDDIALNAME)
 				send_command button.input.device,"'@AKB-',sdATC1[nSetSpeedDial1Name].name,';Input Speed Dial Name;;AKB-;1'" //Pop up the keypad so the user can input a speed dial number
 			}
-			else send_command vdvATC1,"'DIAL ',sdATC1[get_last(ATC_SPEEDDIAL)].number"
+			else send_command vdvATC1,"'DIAL ',sdATC1[get_last(ATC_SPEEDDIALNAME)].number"
 		}				
 	}
 }

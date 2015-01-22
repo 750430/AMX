@@ -60,7 +60,7 @@ define_function closeclient(integer nVal)
 }
 
 define_start
-
+#IF_DEFINED dvIPClient
 wait 50
 {
 	for(x=1;x<=100;x++) 
@@ -73,6 +73,7 @@ wait 50
 	}
 }
 timeline_create(IPReconnectTL,lReconnectTime,1,timeline_relative,timeline_repeat)
+#END_IF
 
 //Popup Kill and Revert to Title Page on start.  Only runs if dvTP is defined in mainline or HoppDEV
 //Title page must be named Title Page
@@ -91,7 +92,7 @@ call 'WRITE_JUPITER'
 define_event //Baudrate Events
 //Online Events for the 8 most common baud rates.  Declare a device array of dv9600N in your define_variable section
 //and the online event for that 9600,N,8,1 will automatically fire.
-
+#IF_DEFINED dvIPClient
 data_event[dvIPClient]
 {
 	online:
@@ -105,7 +106,7 @@ data_event[dvIPClient]
 		off[nIPConnected[get_last(dvIPClient)]]
 	}
 }
-
+#END_IF
 #IF_DEFINED dv9600N data_event[dv9600N]
 {
 	online:

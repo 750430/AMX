@@ -175,17 +175,17 @@ ATC_FLASH			=	31	//Momentary: flash hook
 ATC_PAUSE			=	32 	//Momentary: Press menu button ,
 ATC_CLEAR			=	33 	//Momentary: clear readout
 
-ATC_SPEEDDIAL1		=	101	//Momentary: Speed Dial 1
-ATC_SPEEDDIAL2		=	102	//Momentary: Speed Dial 2
-ATC_SPEEDDIAL3		=	103	//Momentary: Speed Dial 3
-ATC_SPEEDDIAL4		=	104	//Momentary: Speed Dial 4
-ATC_SPEEDDIAL5		=	105	//Momentary: Speed Dial 5
-ATC_SPEEDDIAL6		=	106	//Momentary: Speed Dial 6
-ATC_SPEEDDIAL7		=	107	//Momentary: Speed Dial 7
-ATC_SPEEDDIAL8		=	108	//Momentary: Speed Dial 8
-ATC_SPEEDDIAL9		=	109	//Momentary: Speed Dial 8
-ATC_SPEEDDIAL10		=	110	//Momentary: Speed Dial 8
-integer ATC_SPEEDDIAL[]	=	{101,102,103,104,105,106,107,108,109,110}
+ATC_SPEEDDIALNAME1		=	101	//Momentary: Speed Dial 1
+ATC_SPEEDDIALNAME2		=	102	//Momentary: Speed Dial 2
+ATC_SPEEDDIALNAME3		=	103	//Momentary: Speed Dial 3
+ATC_SPEEDDIALNAME4		=	104	//Momentary: Speed Dial 4
+ATC_SPEEDDIALNAME5		=	105	//Momentary: Speed Dial 5
+ATC_SPEEDDIALNAME6		=	106	//Momentary: Speed Dial 6
+ATC_SPEEDDIALNAME7		=	107	//Momentary: Speed Dial 7
+ATC_SPEEDDIALNAME8		=	108	//Momentary: Speed Dial 8
+ATC_SPEEDDIALNAME9		=	109	//Momentary: Speed Dial 8
+ATC_SPEEDDIALNAME10		=	110	//Momentary: Speed Dial 8
+integer ATC_SPEEDDIALNAME[]	=	{101,102,103,104,105,106,107,108,109,110}
 
 ATC_SPEEDDIALNUM1	=	121	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM2	=	122	//Feedback: Speed Dial Number
@@ -198,6 +198,20 @@ ATC_SPEEDDIALNUM8	=	128	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM9	=	129	//Feedback: Speed Dial Number
 ATC_SPEEDDIALNUM10	=	130	//Feedback: Speed Dial Number
 integer ATC_SPEEDDIALNUM[]	=	{121,122,123,124,125,126,127,128,129,130}
+
+ATC_SPEEDDIAL1		=	151	//Momentary: Speed Dial 1
+ATC_SPEEDDIAL2		=	152	//Momentary: Speed Dial 2
+ATC_SPEEDDIAL3		=	153	//Momentary: Speed Dial 3
+ATC_SPEEDDIAL4		=	154	//Momentary: Speed Dial 4
+ATC_SPEEDDIAL5		=	155	//Momentary: Speed Dial 5
+ATC_SPEEDDIAL6		=	156	//Momentary: Speed Dial 6
+ATC_SPEEDDIAL7		=	157	//Momentary: Speed Dial 7
+ATC_SPEEDDIAL8		=	158	//Momentary: Speed Dial 8
+ATC_SPEEDDIAL9		=	159	//Momentary: Speed Dial 8
+ATC_SPEEDDIAL10		=	160	//Momentary: Speed Dial 8
+integer ATC_SPEEDDIAL[]	=	{151,152,153,154,155,156,157,158,159,160}
+
+
 
 
 define_constant //VTC Channels
@@ -291,7 +305,28 @@ VTC_NEAR				=	105
 VTC_FAR					=	106
 VTC_OPTION				=	107
 VTC_LAYOUT				=	108
-                         
+
+VTC_SET_PRESET1			=	111
+VTC_SET_PRESET2			=	112
+VTC_SET_PRESET3			=	113
+VTC_SET_PRESET4			=	114
+VTC_SET_PRESET5			=	115
+VTC_SET_PRESET6			=	116
+
+VTC_FAR_CAM_UP			=	121
+VTC_FAR_CAM_DOWN		=	122
+VTC_FAR_CAM_LEFT		=	123
+VTC_FAR_CAM_RIGHT		=	124
+VTC_FAR_CAM_ZOOM_IN		=	125
+VTC_FAR_CAM_ZOOM_OUT	=	126
+
+VTC_FAR_PRESET1			=	131
+VTC_FAR_PRESET2			=	132
+VTC_FAR_PRESET3			=	133
+VTC_FAR_PRESET4			=	134
+VTC_FAR_PRESET5			=	135
+VTC_FAR_PRESET6			=	136
+
 
 define_constant //Camera Channels
 CAM_PWR_ON			=	1		//Momentary:
@@ -318,12 +353,22 @@ CAM_PRESET5			=	65		//Momentary:
 CAM_PRESET6			=	66		//Momentary:
 integer CAM_PRESETS[]		=	{61,62,63,64,65,66}
 
+CAM_SET_PRESET1		=	71
+CAM_SET_PRESET2		=	72
+CAM_SET_PRESET3		=	73
+CAM_SET_PRESET4		=	74
+CAM_SET_PRESET5		=	75
+CAM_SET_PRESET6		=	76
+                        
 //Camera Levels
 CAM_PAN_LVL			=	1
 CAM_TILT_LVL		=	2
 CAM_ZOOM_LVL		=	3
 
 define_constant //Tuner Channels 
+TUNER_PWR_ON		=	1
+TUNER_PWR_OFF		=	2
+
 TUNER_DIGIT_0		=	10	//Momentary: Press digit 0
 TUNER_DIGIT_1		=	11	//Momentary: Press digit 1
 TUNER_DIGIT_2		=	12	//Momentary: Press digit 2
@@ -348,6 +393,8 @@ TUNER_CAPTION_OFF 	=	32	//Momentary: Captions off
 TUNER_CAPTION_TOG 	=	33	//Toggle: caption on/off
 TUNER_EXIT        	=	34
 TUNER_ASPECT		=	35
+TUNER_QUERY			=	36
+TUNER_RATIO			=	37
 
 TUNER_MENU			=	44
 TUNER_UP			=	45
@@ -355,6 +402,44 @@ TUNER_DN      		=	46
 TUNER_LEFT			=	47
 TUNER_RIGHT			=	48
 TUNER_OK			=	49
+
+TUNER_FAVORITENAME1		=	101	//Momentary: Speed Dial 1
+TUNER_FAVORITENAME2		=	102	//Momentary: Speed Dial 2
+TUNER_FAVORITENAME3		=	103	//Momentary: Speed Dial 3
+TUNER_FAVORITENAME4		=	104	//Momentary: Speed Dial 4
+TUNER_FAVORITENAME5		=	105	//Momentary: Speed Dial 5
+TUNER_FAVORITENAME6		=	106	//Momentary: Speed Dial 6
+TUNER_FAVORITENAME7		=	107	//Momentary: Speed Dial 7
+TUNER_FAVORITENAME8		=	108	//Momentary: Speed Dial 8
+TUNER_FAVORITENAME9		=	109	//Momentary: Speed Dial 8
+TUNER_FAVORITENAME10		=	110	//Momentary: Speed Dial 8
+integer TUNER_FAVORITENAME[]	=	{101,102,103,104,105,106,107,108,109,110}
+
+TUNER_FAVORITENUM1	=	121	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM2	=	122	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM3	=	123	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM4	=	124	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM5	=	125	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM6	=	126	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM7	=	127	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM8	=	128	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM9	=	129	//Feedback: Speed Dial Number
+TUNER_FAVORITENUM10	=	130	//Feedback: Speed Dial Number
+integer TUNER_FAVORITENUM[]	=	{121,122,123,124,125,126,127,128,129,130}
+
+TUNER_FAVORITE1		=	151	//Momentary: Speed Dial 1
+TUNER_FAVORITE2		=	152	//Momentary: Speed Dial 2
+TUNER_FAVORITE3		=	153	//Momentary: Speed Dial 3
+TUNER_FAVORITE4		=	154	//Momentary: Speed Dial 4
+TUNER_FAVORITE5		=	155	//Momentary: Speed Dial 5
+TUNER_FAVORITE6		=	156	//Momentary: Speed Dial 6
+TUNER_FAVORITE7		=	157	//Momentary: Speed Dial 7
+TUNER_FAVORITE8		=	158	//Momentary: Speed Dial 8
+TUNER_FAVORITE9		=	159	//Momentary: Speed Dial 8
+TUNER_FAVORITE10		=	160	//Momentary: Speed Dial 8
+integer TUNER_FAVORITE[]	=	{151,152,153,154,155,156,157,158,159,160}
+
+
 
 
 define_constant //Mixer Channels
@@ -367,6 +452,7 @@ MIX_QUERY 			=	4	//Momentary: Get Vol/Mute Status
 MIX_MUTE_OFF		=	5	//Momentary: Mute off
 MIX_MUTE_ON 		=	6	//Momentary: Mute On
 MIX_UPDATE_ALL		=	7	//Momentary: Updates the Touchpanel for all Levels, regardless of the level that was pulsed
+MIX_RESUBSCRIBE		=	8	//Momentary: Forces Tesira devices to resubscribe all volume levels
 
 MIX2_VOL_UP 		=	101	//Ramping: Vol Up
 MIX2_VOL_DN 		=	102 	//Ramping: Vol Dn 

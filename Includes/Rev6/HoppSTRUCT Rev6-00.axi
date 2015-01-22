@@ -73,6 +73,7 @@ structure menu
 	char 		popup[35]
 	integer 	activesubmenu[8]
 	char 		submenupopups[8][45]
+	integer		flag1
 }
 
 //used for volume/mute control through mixer
@@ -143,11 +144,21 @@ structure guide
 	char paneCenter[35]
 	char paneLeft[35]
 	char paneRight[35]
+	char sourcepopup[35]
+	char headerpopup[35]
 	integer nActiveSource
 	integer nActiveMenu
 	integer nActiveSubMenu
 	integer nCurrentSubPage
 	integer nSubPages
+}
+
+structure preview
+{
+	char name[35]
+	integer input
+	integer staticstatus
+	integer livestatus
 }
 
 (***********************************************************)
@@ -212,6 +223,22 @@ define_function write_ir(ir_struct iI[], char cFileName[])		//This function is c
 	// Convert To Binary
 	lPos = 1
 	slReturn = variable_to_string(iI, sBINString, lPos)
+	// Save Structure to Disk - Binary
+	slFile = file_open(cFileName, 2)
+	slReturn = file_write(slFile, sBINString, length_string(sBINString))
+	slReturn = file_close(slFile)
+}
+
+define_function write_preview(preview iP[], char cFileName[])		//This function is called in DEFINE_START to pass the Preview structure to the module
+{
+	local_var	long lPos
+	local_var	slong slReturn
+	local_var	slong slFile
+	local_var	slong slResult
+	local_var	char sBINString[10000]
+	// Convert To Binary
+	lPos = 1
+	slReturn = variable_to_string(iP, sBINString, lPos)
 	// Save Structure to Disk - Binary
 	slFile = file_open(cFileName, 2)
 	slReturn = file_write(slFile, sBINString, length_string(sBINString))

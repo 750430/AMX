@@ -212,6 +212,10 @@ button_event[dvTP_GUIDE,GUIDE_SHOW_ME]
 		nActiveSource[nActiveTP]=guideMain[nActiveGuidePage[nActiveTP]].nActiveSource
 		nActiveMenu[nActiveTP]=guideMain[nActiveGuidePage[nActiveTP]].nActiveMenu
 		if(nActiveSource[nActiveTP]) srcMain[nActiveSource[nActiveTP]].activesubmenu[nActiveTP]=guideMain[nActiveGuidePage[nActiveTP]].nActiveSubMenu
+		#IF_DEFINED nDisplaySource
+		nDisplaySource[nActiveTP]=guideMain[nActiveGuidePage[nActiveTP]].nActiveSource
+		if(nActiveSource[nActiveTP]) srcMain[nDisplaySource[nActiveTP]].activesubmenu[nActiveTP]=guideMain[nActiveGuidePage[nActiveTP]].nActiveSubMenu
+		#END_IF
 		if(nActiveMenu[nActiveTP]) mnuMain[nActiveMenu[nActiveTP]].activesubmenu[nActiveTP]=guideMain[nActiveGuidePage[nActiveTP]].nActiveSubMenu
 		
 		send_command dvTP,"'@PPN-',guideMain[nActiveGuidePage[nActiveTP]].guidepopup,';Main Page'"
@@ -237,10 +241,14 @@ button_event[dvTP_GUIDE,GUIDE_EXIT]
 		off[nActiveMenu[nActiveTP]]
 		send_command button.input.device,"'@PPX'"
 		
+		#IF_DEFINED btnRoomConfig
+		do_push(dvTP[nActiveTP],btnRoomConfig[nActiveRoomConfig])
+		#ELSE
 		#IF_DEFINED btnStart
 		do_push(dvTP[nActiveTP],btnStart)
 		#ELSE
 		send_command button.input.device,"'PAGE-Main Page'"
+		#END_IF
 		#END_IF
 
 	}

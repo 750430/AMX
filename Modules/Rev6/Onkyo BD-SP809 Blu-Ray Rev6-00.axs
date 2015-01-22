@@ -1,4 +1,4 @@
-module_name='Onkyo BD-SP809 Blu-Ray Rev6-00'(dev dvTP[], dev vdvBluRay, dev vdvBluRay_FB, dev dvBluRay)
+module_name='Onkyo BD-SP809 Blu-Ray Rev6-00'(dev dvTP[], dev vdvDevice, dev vdvDevice_FB, dev dvDevice)
 (***********************************************************)
 (*  FILE_LAST_MODIFIED_ON: 01/20/2008  AT: 16:42:25        *)
 (***********************************************************)
@@ -8,7 +8,7 @@ module_name='Onkyo BD-SP809 Blu-Ray Rev6-00'(dev dvTP[], dev vdvBluRay, dev vdvB
 (* REV HISTORY:                                            *)
 (***********************************************************)
 (*
-define_module 'Onkyo BD-SP809 Blu-Ray Rev6-00' dvr1(dvTP_DEV[1],vdvDEV1,vdvDEV1_FB,dvBluray)
+define_module 'Onkyo BD-SP809 Blu-Ray Rev6-00' dvr1(dvTP_DEV[1],vdvDEV1,vdvDEV1_FB,dvDevice)
 send_command data.device,"'SET BAUD 9600,N,8,1'"
 
 *)
@@ -78,7 +78,7 @@ cCmdStr[DVR_EXIT]		="'!7RET',$0D,$0A"
 cCmdStr[DVR_HOME]		="'!7HOM',$0D,$0A"
 
 
-wait 200 send_string dvBluRay,"'!7PMS01',$0D,$0A" //This registers to receive notices from the device when the play status changes
+wait 200 send_string dvDevice,"'!7PMS01',$0D,$0A" //This registers to receive notices from the device when the play status changes
 
 #include 'HoppFB Rev6-00'
 (***********************************************************)
@@ -86,7 +86,7 @@ wait 200 send_string dvBluRay,"'!7PMS01',$0D,$0A" //This registers to receive no
 (***********************************************************)
 define_event
 
-data_event[dvBluRay]
+data_event[dvDevice]
 {
 	string:
 	{
@@ -123,12 +123,12 @@ data_event[dvBluRay]
 	}
 }
 
-channel_event[vdvBluRay,0]
+channel_event[vdvDevice,0]
 {
 	on:	
 	{
-		send_string dvBluRay,cCmdStr[channel.channel]
-		if(channel.channel=DVR_PLAY) wait 2 send_string dvBluRay,"'!7PMS01',$0D,$0A" //Register to receive status updates
+		send_string dvDevice,cCmdStr[channel.channel]
+		if(channel.channel=DVR_PLAY) wait 2 send_string dvDevice,"'!7PMS01',$0D,$0A" //Register to receive status updates
 	}
 }
 
@@ -137,11 +137,11 @@ button_event [dvTP,0]
 	push:	
 	{
 		to[button.input.device,button.input.channel]
-		on[vdvBluRay,button.input.channel]	
+		on[vdvDevice,button.input.channel]	
 	}
 	release: 
 	{
-		off[vdvBluRay,button.input.channel]
+		off[vdvDevice,button.input.channel]
 	}
 }
 

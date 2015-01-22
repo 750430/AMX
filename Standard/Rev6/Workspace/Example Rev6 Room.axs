@@ -565,8 +565,9 @@ guideMain[2].popup[1]			=	'[help]Understanding Sources'
 guideMain[3].name				=	'Seeing and Hearing Sources'
 guideMain[3].popup[1]			=	'[help]Seeing a Source'
 guideMain[3].popup[2]			=	'[help]Hearing a Source'
+guideMain[3].paneLeft			=	'[paneLeft]Blu-Ray'
 guideMain[3].paneRight			=	'[paneRight]Destinations'
-guideMain[3].paneCenter			=	'[source]Blu-Ray'
+guideMain[3].paneCenter			=	'[source]Blu-Ray Controls'
 guideMain[3].nActiveSource		=	srcBluRay
 
 guideMain[4].name				=	'Audio Conferencing'

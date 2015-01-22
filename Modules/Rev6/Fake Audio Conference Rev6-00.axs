@@ -38,9 +38,9 @@ volatile	integer	nNewDigits
 
 define_function show_phone_number(char cNumber[])
 {
-	if(length_string(cNumber)<=12) send_command dvTP,"'!T',1,cNumber"	
-	else if(length_string(cNumber)<=24) send_command dvTP,"'!T',1,left_string(cNumber,12),$0D,$0A,mid_string(cNumber,13,12)"	
-	else send_command dvTP,"'!T',1,mid_string(cNumber,length_string(cNumber)-23,12),$0D,$0A,right_string(cNumber,12)"
+	if(length_string(cNumber)<=12) send_command dvTP,"'^TXT-1,0,',cNumber"	
+	else if(length_string(cNumber)<=24) send_command dvTP,"'^TXT-1,0,',left_string(cNumber,12),$0D,$0A,mid_string(cNumber,13,12)"	
+	else send_command dvTP,"'^TXT-1,0,',mid_string(cNumber,length_string(cNumber)-23,12),$0D,$0A,right_string(cNumber,12)"
 }
 
 define_function key(char nVal[])

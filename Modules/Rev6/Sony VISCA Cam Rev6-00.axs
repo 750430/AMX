@@ -156,7 +156,7 @@ BUTTON_EVENT [vdvTP, 0]
 		IF(nCTRL >= CAM_PRESET1 && nCTRL <= CAM_PRESET6)
 		{
 			SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[nCTRL],$FF"
-			SEND_COMMAND vdvTP[nCAM],"'ABEEP'"
+			SEND_COMMAND vdvTP[nCAM],"'^ABP'"
 		}
 	}
   RELEASE:
@@ -260,7 +260,37 @@ CHANNEL_EVENT[vdvCAM, 0]
 			{
 				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$02,cPTZPre[nPTZPre],$FF"
 			}
-		}
+			case CAM_SET_PRESET1: 
+			{
+				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[CAM_PRESET1],$FF"
+				SEND_COMMAND vdvTP[nCAM],"'^ABP'"
+			}
+			case CAM_SET_PRESET2: 
+			{
+				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[CAM_PRESET2],$FF"
+				SEND_COMMAND vdvTP[nCAM],"'^ABP'"
+			}
+			case CAM_SET_PRESET3: 
+			{
+				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[CAM_PRESET3],$FF"
+				SEND_COMMAND vdvTP[nCAM],"'^ABP'"
+			}
+			case CAM_SET_PRESET4: 
+			{
+				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[CAM_PRESET4],$FF"
+				SEND_COMMAND vdvTP[nCAM],"'^ABP'"
+			}
+			case CAM_SET_PRESET5: 
+			{
+				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[CAM_PRESET5],$FF"
+				SEND_COMMAND vdvTP[nCAM],"'^ABP'"
+			}
+			case CAM_SET_PRESET6: 
+			{
+				SEND_STRING SONY_CAM[nCAM].dvCAM, "addr,$01,$04,$3F,$01,cPTZPre[CAM_PRESET6],$FF"
+				SEND_COMMAND vdvTP[nCAM],"'^ABP'"
+			}
+		}                                                                                           
   }
   OFF:
   {

@@ -80,6 +80,50 @@ sinteger		nValue
 (***********************************************************)
 (*        SUBROUTINE/FUNCTION DEFINITIONS GO BELOW         *)
 (***********************************************************)
+define_function read_mixer()
+{
+	// Read Binary File
+	slFile = file_open('BinaryMXREncode.xml',1)
+	slResult = file_read(slFile, sBINString, max_length_string(sBINString))
+	slResult = file_close (slFile)
+	// Convert To Binary
+	lPos = 1
+	slReturn = string_to_variable(MXR_VOL, sBINString, lPos)	
+	
+	update_tp()
+}
+
+define_function init_strings()
+{
+	for(x=1;x<=max_length_array(MXR_VOL);x++)
+	{
+		if(length_string(mxr_vol[x].name)>0 or length_string(mxr_vol[x].instIDTag)>0 or length_string(mxr_vol[x].addr)>0 or mxr_vol[x].instID) on[mxr_vol[x].enabled]
+	
+		//-------set up defaults-----
+		//If max AND min=0, you either have mute block or you want defaults
+		if(!MXR_VOL[x].max && !MXR_VOL[x].min)
+		{
+			MXR_VOL[x].max=DefaultMax
+			MXR_VOL[x].min=DefaultMin
+		}
+		
+		//If no chan, chanin, or chanout defined, fill in chan 
+		if(!length_string(MXR_VOL[x].chan) && !length_string(MXR_VOL[x].chanin) && 
+		   !length_string(MXR_VOL[x].chanout)) 	MXR_VOL[x].chan=DefaultChan
+		
+		///If any other value missing, fill it in
+		if(!MXR_VOL[x].ramp) 					MXR_VOL[x].ramp=DefaultRamp
+		if(!MXR_VOL[x].inc) 					MXR_VOL[x].inc=DefaultInc
+		if(!length_string(MXR_VOL[x].addr)) 	MXR_VOL[x].addr=DefaultAddr
+		if(!length_string(MXR_VOL[x].type)) 	MXR_VOL[x].type=FADER_TYPE
+		if(!MXR_VOL[x].lvl)						MXR_VOL[x].lvl=DefaultLevel
+
+		//sets up time that will be used for each timeline
+		nArray[x]=(MXR_VOL[x].ramp*1000)/ABS_VALUE(((MXR_VOL[x].max-MXR_VOL[x].min)/MXR_VOL[x].inc))
+		show_level(x)
+	}
+}
+
 
 define_function show_level(integer nI)
 {
@@ -149,49 +193,7 @@ define_function Ramp(integer nDir, integer nI)
 	show_level(nI)
 }
 
-define_function read_mixer()
-{
-	// Read Binary File
-	slFile = file_open('BinaryMXREncode.xml',1)
-	slResult = file_read(slFile, sBINString, max_length_string(sBINString))
-	slResult = file_close (slFile)
-	// Convert To Binary
-	lPos = 1
-	slReturn = string_to_variable(MXR_VOL, sBINString, lPos)	
-	
-	update_tp()
-}
 
-define_function init_strings()
-{
-	for(x=1;x<=max_length_array(MXR_VOL);x++)
-	{
-		if(length_string(mxr_vol[x].name)>0 or length_string(mxr_vol[x].instIDTag)>0 or length_string(mxr_vol[x].addr)>0 or mxr_vol[x].instID) on[mxr_vol[x].enabled]
-	
-		//-------set up defaults-----
-		//If max AND min=0, you either have mute block or you want defaults
-		if(!MXR_VOL[x].max && !MXR_VOL[x].min)
-		{
-			MXR_VOL[x].max=DefaultMax
-			MXR_VOL[x].min=DefaultMin
-		}
-		
-		//If no chan, chanin, or chanout defined, fill in chan 
-		if(!length_string(MXR_VOL[x].chan) && !length_string(MXR_VOL[x].chanin) && 
-		   !length_string(MXR_VOL[x].chanout)) 	MXR_VOL[x].chan=DefaultChan
-		
-		///If any other value missing, fill it in
-		if(!MXR_VOL[x].ramp) 					MXR_VOL[x].ramp=DefaultRamp
-		if(!MXR_VOL[x].inc) 					MXR_VOL[x].inc=DefaultInc
-		if(!length_string(MXR_VOL[x].addr)) 	MXR_VOL[x].addr=DefaultAddr
-		if(!length_string(MXR_VOL[x].type)) 	MXR_VOL[x].type=FADER_TYPE
-		if(!MXR_VOL[x].lvl)						MXR_VOL[x].lvl=DefaultLevel
-
-		//sets up time that will be used for each timeline
-		nArray[x]=(MXR_VOL[x].ramp*1000)/ABS_VALUE(((MXR_VOL[x].max-MXR_VOL[x].min)/MXR_VOL[x].inc))
-		show_level(x)
-	}
-}
 
 define_function update_tp()
 {

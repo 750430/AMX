@@ -1,4 +1,4 @@
-MODULE_NAME='Lutron GEye Rev6-00'(DEV dvTP[], DEV dvLights, INTEGER nAddr)
+MODULE_NAME='Lutron GEye Rev6-00'(dev dvTP[], dev vdvLights, dev vdvLightsFB, dev dvLights, integer nAddr)
 (***********************************************************)
 (* System Type : NetLinx                                   *)
 (***********************************************************)
@@ -9,7 +9,7 @@ MODULE_NAME='Lutron GEye Rev6-00'(DEV dvTP[], DEV dvLights, INTEGER nAddr)
 (*          DEVICE NUMBER DEFINITIONS GO BELOW             *)
 (***********************************************************)
 //SET BAUD 9600,N,8,1 485 DISABLE
-//define_module 'Lutron GEye Rev6-00' LIGHTS1(vdvTP_LIGHT1,dvLights,nLightingAddr)
+//define_module 'Lutron GEye Rev6-00' LIGHTS1(dvTP_LIGHT[1],vdvLIGHT1,vdvLIGHT1_FB,dvLights,nLightingAddr)
 DEFINE_DEVICE
 
 (***********************************************************)

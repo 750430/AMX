@@ -29,9 +29,9 @@ NumTPs						=	1 	//This constant sets the number of touchpanels in the system an
 
 define_constant //buttons
 
-integer btnSources[]		=	{	} //Starting at 1, these are the buttons for Sources.  These buttons use dvTP_SRC (1000X:2:1)
-integer btnDests[]			=	{	} //Starting at 1, these are the buttons for Destinations.  These buttons use dvTP_DEST (1000X:3:1)
-integer btnMenus[]			=	{	} //Starting at 1, these are the buttons for Menus.  These buttons use dvTP_MENU (1000X:4:1)
+integer btnSources[]		=	{    } //Starting at 1, these are the buttons for Sources.  These buttons use dvTP_SRC (1000X:2:1)
+integer btnDests[]			=	{    } //Starting at 1, these are the buttons for Destinations.  These buttons use dvTP_DEST (1000X:3:1)
+integer btnMenus[]			=	{    } //Starting at 1, these are the buttons for Menus.  These buttons use dvTP_MENU (1000X:4:1)
 integer btnSubmenus[]		=	{11,12,13,14,15,16,17,18} //Starting at 11, these are the buttons for the left side Submenus.  These buttons use dvTP_MENU (1000X:4:1)
 
 btnStart					=	1
@@ -105,16 +105,19 @@ volatile		integer		nPrevSource[NumTPs]
 volatile		integer		nActiveDest[NumTPs]
 volatile		integer		nActiveMenu[NumTPs]
 
-define_variable //Navigation Variables
-
-volatile		integer		nEnterTechMode
-
 define_variable //Sources and Destinations
 
-non_volatile	source		srcMain[10]
-persistent		destination	dstMain[3]
+non_volatile	source		srcMain[]
+persistent		destination	dstMain[]
 persistent		destination	dstSpeakers[1]
 volatile		menu		mnuMain[2]
+
+define_variable //Structure Instances
+
+volatile		volblock	vol[30]
+volatile		camera		cam[10]
+volatile		ipcomm 		ip[10]
+volatile		ir_struct	ir[10]
 
 define_variable //Popups
 
@@ -228,16 +231,10 @@ define_function switchvideo(i,o) //Extron Crosspoint
 	//else send_command dvSwitcher,"'CI',itoa(i),'O',itoa(o),'T'"
 }
 
-define_function show_startup_instructions(TP)
-{
-	send_command dvTP[tp],"'@PPF-[paneLeft]Tabs'"
-	send_command dvTP[tp],"'@PPF-[paneRight]Tabs'"
-	send_command dvTP[tp],"'@PPN-',cStartupPopups[tp],';Main Page'"
-}
-
 define_function update_panel()
 {
 	update_destination_text()
+	pulse[vdvMixer[1],MIX_UPDATE_ALL]
 }
 
 define_function update_destination_text()
@@ -251,32 +248,32 @@ define_function update_destination_text()
 				if(dstMain[x].src and length_string(srcMain[dstMain[x].src].name)>0)
 				{
 					send_command dvTP_DEST,"'^TXT-',itoa(x),',0,',srcMain[dstMain[x].src].name"
-					send_command dvTP_DEST,"'^TXT-',itoa(x+100),',0,',srcMain[dstMain[x].src].name"
+					send_command dvTP_DISP[x],"'^TXT-',itoa(VD_SOURCE_TEXT),',0,',srcMain[dstMain[x].src].name"
 				}
 				else
 				{
 					send_command dvTP_DEST,"'^TXT-',itoa(x),',0,On'"
-					send_command dvTP_DEST,"'^TXT-',itoa(x+100),',0,On'"
+					send_command dvTP_DISP[x],"'^TXT-',itoa(VD_SOURCE_TEXT),',0,On'"
 				}
-				send_command dvTP_DEST,"'^BMF-',itoa(x+100),',0,%CT LightLime'"
+				send_command dvTP_DISP[x],"'^BMF-',itoa(VD_SOURCE_TEXT),',0,%CT LightLime'"
 			}
 			case VD_PWR_OFF:
 			{
 				send_command dvTP_DEST,"'^TXT-',itoa(x),',0,Off'"
-				send_command dvTP_DEST,"'^TXT-',itoa(x+100),',0,Off'"
-				send_command dvTP_DEST,"'^BMF-',itoa(x+100),',0,%CT LightRed'"
+				send_command dvTP_DISP[x],"'^TXT-',itoa(VD_SOURCE_TEXT),',0,Off'"
+				send_command dvTP_DISP[x],"'^BMF-',itoa(VD_SOURCE_TEXT),',0,%CT LightRed'"
 			}
 			case VD_COOLING:
 			{
 				send_command dvTP_DEST,"'^TXT-',itoa(x),',0,Cooling Down'"
-				send_command dvTP_DEST,"'^TXT-',itoa(x+100),',0,Cooling Down'"
-				send_command dvTP_DEST,"'^BMF-',itoa(x+100),',0,%CT VeryLightYellow'"
+				send_command dvTP_DISP[x],"'^TXT-',itoa(VD_SOURCE_TEXT),',0,Cooling Down'"
+				send_command dvTP_DISP[x],"'^BMF-',itoa(VD_SOURCE_TEXT),',0,%CT VeryLightYellow'"
 			}
 			case VD_WARMING:
 			{
 				send_command dvTP_DEST,"'^TXT-',itoa(x),',0,Warming Up'"
-				send_command dvTP_DEST,"'^TXT-',itoa(x+100),',0,Warming Up'"
-				send_command dvTP_DEST,"'^BMF-',itoa(x+100),',0,%CT VeryLightYellow'"
+				send_command dvTP_DISP[x],"'^TXT-',itoa(VD_SOURCE_TEXT),',0,Warming Up'"
+				send_command dvTP_DISP[x],"'^BMF-',itoa(VD_SOURCE_TEXT),',0,%CT VeryLightYellow'"
 			}
 		}
 	}
@@ -287,12 +284,12 @@ define_function update_destination_text()
 (***********************************************************)
 define_start //Sources
 
-//srcMain[	].name						=	'PC 1'
-//srcMain[	].tie						=	3
-//srcMain[	].popup						=	'[source]PC'
-//srcMain[	].paneright					=	'[paneRight]Destinations'
-//srcMain[	].vol						=	volProgram
-//srcMain[	].voltype					=	PROG_VOL_TYPE
+//srcMain[    ].name						=	'PC 1'
+//srcMain[    ].tie						=	3
+//srcMain[    ].popup						=	'[source]PC'
+//srcMain[    ].paneright					=	'[paneRight]Destinations'
+//srcMain[    ].vol						=	volProgram
+//srcMain[    ].voltype					=	PROG_VOL_TYPE
 //
 //srcMain[srcATC].name					=	'ATC'
 //srcMain[srcATC].popup					=	'[audioConf]Keypad'
@@ -311,15 +308,15 @@ define_start //Sources
 
 define_start //Destinations
 
-//dstMain[	].name					=	'Projector 1'
-//dstMain[	].tie					=	3
-//dstMain[	].screenup				=	{dvRelays,1}
-//dstMain[	].screendown			=	{dvRelays,2}
+//dstMain[    ].name					=	'Projector 1'
+//dstMain[    ].tie					=	3
+//dstMain[    ].screenup				=	{dvRelays,1}
+//dstMain[    ].screendown			=	{dvRelays,2}
 //dstMain[    ].liftup					=	{dvRelays,3}
 //dstMain[    ].liftdown				=	{dvRelays,4}
 //
-//dstMain[	].name					=	'Projector 2'
-//dstMain[	].tie					=	2
+//dstMain[    ].name					=	'Projector 2'
+//dstMain[    ].tie					=	2
 //dstMain[    ].screenup				=	{dvRelays,1}
 //dstMain[    ].screendown				=	{dvRelays,2}
 //dstMain[    ].liftup					=	{dvRelays,3}
@@ -343,11 +340,12 @@ mnuMain[mnuAudio].popup						=	'[audio]Volume'
 
 define_start //Popups
 
-cSourcePopups[tpMain]				=	'[sources]Main'
-
-cHeaderPopups[tpMain]				=	'[header]Main'
-
-cStartupPopups[tpMain]				=	'[help]Startup'
+for(x=1;x<=NumTPs;x++) 
+{
+	cSourcePopups[x]			=	'[sources]Main'
+	cHeaderPopups[x]			=	'[header]Main'
+	cStartupPopups[x]			=	'[help]Startup'
+}
 
 define_start //Camera
 //
@@ -357,28 +355,35 @@ define_start //Camera
 //Cam[1].tilt 	= 6
 //Cam[1].zoom 	= 3
 
-write_camera()
+write_camera(cam,'BinaryCAMEncode.xml')
+
+define_start //IR
+
+//ir[1].carrier	=	CAROFF_TYPE
+//ir[1].mode		=	IR_TYPE
+//ir[1].pulsetime	=	5
+
+write_ir(ir,'BinaryIREncode.xml')
 
 
 define_start //Volumes
 //Biamp Style
-//vol[].instID			=	12
+//vol[].instIDTag		=	'volMaster'
 //vol[].chan			=	'1'
-//vol[].addr			=	'1'
 //
 //ClearOne Style
 //vol[].addr		= 'D0'	//Address of XAP unit
-//vol[].type		= 'F'			//I=Input, O=Output, P=Process, M=Mic
-//vol[].chan		= '1'			//Channel to be controlled
-//vol[].min			= -30			//Min level
-//vol[].max			= 18			//Max level
-//vol[].ramp		= 10			//Ramp time (dB/s)
+//vol[].type		= 'F'	//I=Input, O=Output, P=Process, M=Mic
+//vol[].chan		= '1'	//Channel to be controlled
+//vol[].min			= -30	//Min level
+//vol[].max			= 18	//Max level
+//vol[].ramp		= 10	//Ramp time (dB/s)
 
 //Polycom Style
 //
-//vol[].name		=	''
+//vol[].name		=	'volMaster'
 
-write_mixer()
+write_mixer(vol,'BinaryMXREncode.xml')
 
 define_start //IP
 
@@ -398,12 +403,21 @@ define_start //Actual Startup
 
 define_start //Most Include Files go here
 #INCLUDE 'HoppSTART Rev6-00'
-#INCLUDE 'HoppTECH Rev6-00'
 #INCLUDE 'HoppFB Rev6-00'
+//#INCLUDE 'RenameATC1 Rev6-00'
+//#INCLUDE 'RenameATC2 Rev6-00'
+//#INCLUDE 'RenameLIGHTS1 Rev6-00'
+//#INCLUDE 'RenameLIGHTS2 Rev6-00'
+//#INCLUDE 'RenameLIGHTS3 Rev6-00'
 (***********************************************************)
 (*                  MODULES GO BELOW                       *)
 (***********************************************************)
-//define_module 'IR Devices Rev6-00' ir1(vdvTP_IR,dvIR)
+//define_module 'IR Devices Rev6-01' ir1(vdvTP_IR,dvIR)
+//define_module 'Fake Projector Rev6-01' disp1(dvTP_DISP[1],vdvDISP1,vdvDISP1_FB,dvProj1)
+//define_module 'Fake Mixer Rev6-00' mxr1(vdvTP_VOL,vdvMixer,vdvMixer_FB,dvMixer)     
+//define_module 'Fake Video Conference Rev6-00' vtc1(dvTP_VTC[1],vdvVTC1,vdvVTC1_FB,dvVTC) 
+//define_module 'Fake Audio Conference Rev6-00' atc1(dvTP_ATC[1],vdvATC1,vdvATC1_FB,dvMixer) 
+define_module 'Auto Shutdown Rev6-00' sd1(dvTP_DEV[1],dcShutDown)
 (***********************************************************)
 (*                THE EVENTS GO BELOW                      *)
 (***********************************************************)
@@ -422,14 +436,14 @@ data_event[dvTP]
 		{
 			pulse[vdvRenaming[get_last(dvTP)],RNM_ABORT]
 		}
-		else if (left_string(cTPResponse,5)='KEYP-')
+		else if ((left_string(cTPResponse,5)='KEYP-') or (left_string(cTPResponse,4)='AKP-'))
 		{
 			pulse[vdvRenaming[get_last(dvTP)],RNM_KEYPAD_RCVD]
 		}
-		else if (left_string(cTPResponse,5)='KEYB-')
+		else if ((left_string(cTPResponse,5)='KEYB-') or (left_string(cTPResponse,4)='AKB-'))
 		{
 			pulse[vdvRenaming[get_last(dvTP)],RNM_KEYBRD_RCVD]
-		}
+		}			
 	}
 }
 
@@ -499,9 +513,9 @@ button_event[dvTP,btnStart]  //This version of the Start Button is for a regular
 		nActiveTP=get_last(dvTP)
 		send_command button.input.device,"'@PPN-',cSourcePopups[nActiveTP],';Main Page'"
 		send_command button.input.device,"'@PPN-',cHeaderPopups[nActiveTP],';Main Page'"		
+		send_command button.input.device,"'@PPN-',cStartupPopups[nActiveTP],';Main Page'"
 		send_command button.input.device,"'PAGE-Main Page'"
-		show_startup_instructions(nActiveTP)
-		query_mixer()
+		pulse[vdvMixer[1],MIX_UPDATE_ALL]
 	}
 }
 
@@ -550,7 +564,9 @@ button_event[dvTP,btnStart]  //This version of the Start Button is for a regular
 //					}
 //					case prsManual:
 //					{
-//						show_startup_instructions(nActiveTP)
+//						send_command dvTP[nActiveTP],"'@PPF-[paneLeft]Tabs'"
+//						send_command dvTP[nActiveTP],"'@PPF-[paneRight]Tabs'"
+//						send_command dvTP[nActiveTP],"'@PPN-',cStartupPopups[nActiveTP],';Main Page'"
 //					}
 //				}
 //			}
@@ -575,10 +591,7 @@ button_event[dvTP,btnShutDownConfirm]
 		nActiveTP=get_last(dvTP)
 		switch(button.input.channel)
 		{
-			case btnShutDown: 
-			{
-				send_command button.input.device,"'@PPN-[popup]Power;Main Page'"
-			}
+			case btnShutDown: send_command button.input.device,"'@PPN-[popup]Power;Main Page'"
 			case btnShutDownCancel: send_command button.input.device,"'@PPF-[popup]Power;Main Page'"
 			case btnShutDownConfirm:
 			{
@@ -605,16 +618,8 @@ button_event[dvTP_MENU,btnMenus]
 {
 	push:
 	{
-		nActiveTP=get_last(dvTP)
-		if(nActiveMenu[nActiveTP]=get_last(btnMenus))
-		{
-			if(nPrevSource[nActiveTP]) do_push(dvTP_SRC[nActiveTP],btnSources[nPrevSource[nActiveTP]])
-			else 
-			{
-				show_startup_instructions(nActiveTP)
-				off[nActiveMenu[nActiveTP]]
-			}
-		}		
+		nActiveTP=get_last(dvTP_MENU)
+		if(nActiveMenu[nActiveTP]=get_last(btnMenus) and nPrevSource[nActiveTP]) do_push(dvTP_SRC[nActiveTP],btnSources[nPrevSource[nActiveTP]])
 		else
 		{
 			nActiveMenu[nActiveTP]=get_last(btnMenus)
@@ -641,7 +646,7 @@ button_event[dvTP_MENU,btnSubmenus]
 {
 	push:
 	{
-		nActiveTP=get_last(dvTP)
+		nActiveTP=get_last(dvTP_MENU)
 		if(nActiveMenu[nActiveTP])
 		{
 			mnuMain[nActiveMenu[nActiveTP]].activesubmenu[nActiveTP]=get_last(btnSubmenus)

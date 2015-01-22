@@ -34,7 +34,7 @@ PollSrc		=	2
 define_variable
 
 long 		lPollArray[]				= {4100,4100}
-long 		lCmdArray[]				=	{1510,1510}
+long 		lCmdArray[]				=	{151z0,1510}
 
 integer 	nPollType = 0
 integer 	nCmd=0
@@ -47,6 +47,8 @@ integer		nCmdPwrOn
 
 integer		nActivePower
 integer		nActiveInput
+
+integer		nErrorReceived
 
 define_variable //Feedback Variables
 
@@ -87,76 +89,78 @@ DEFINE_FUNCTION Parse(CHAR cCompStr[100])
 {
 	STACK_VAR INTEGER nVar
 	
-//	if(find_string(cCompStr,"'ERR'",1) and timeline_active(tlPoll)) SEND_STRING dvLCD,"cPollStr[TIMELINE.SEQUENCE]"
-//Dont uncomment this unless you can figure out how to stop error chaining from happening.
-	
-	SWITCH(nPollType)
+	if(find_string(cCompStr,"'ERR'",1)) on[nErrorReceived]
+
+	else
 	{
-		CASE PollPwr:
+		SWITCH(nPollType)
 		{
-			SELECT
+			CASE PollPwr:
 			{
-				ACTIVE(FIND_STRING(cCompStr,"'1'",1)||FIND_STRING(cCompStr,"'2'",1)):
+				SELECT
 				{
-					nActivePower=VD_PWR_ON
-					IF(nCmd=VD_PWR_ON) CmdExecuted()
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'0'",1)):
-				{
-					nActivePower=VD_PWR_OFF
-					IF(nCmd=VD_PWR_OFF) CmdExecuted()
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'OK'",1)):
-				{
-					if(nCmd=VD_PWR_OFF) nActivePower=VD_COOLING
-					if(nCmd=VD_PWR_ON or nCmdPwrOn) nActivePower=VD_WARMING
-				}
-			}	
-		}
-		CASE PollSrc:
-		{
-			SELECT
-			{
-				ACTIVE(FIND_STRING(cCompStr,"'1'",1)):
-				{
-					nActiveInput=VD_SRC_HDMI1
-					IF(nCmd=VD_SRC_HDMI1) CmdExecuted()					
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'2'",1)):
-				{
-					nActiveInput=VD_SRC_HDMI2
-					IF(nCmd=VD_SRC_HDMI2) CmdExecuted()	
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'3'",1)):
-				{
-					nActiveInput=VD_SRC_HDMI3
-					IF(nCmd=VD_SRC_HDMI3) CmdExecuted()	
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'4'",1)):
-				{
-					nActiveInput=VD_SRC_AUX1
-					IF(nCmd=VD_SRC_AUX1) CmdExecuted()	
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'5'",1)):
-				{
-					nActiveInput=VD_SRC_CMPNT1
-					IF(nCmd=VD_SRC_CMPNT1) CmdExecuted()	
-				}				
-				ACTIVE(FIND_STRING(cCompStr,"'6'",1)):
-				{
-					nActiveInput=VD_SRC_VID1
-					IF(nCmd=VD_SRC_VID1) CmdExecuted()					
-				}
-				ACTIVE(FIND_STRING(cCompStr,"'7'",1)):
-				{
-					nActiveInput=VD_SRC_VID2
-					IF(nCmd=VD_SRC_VID2) CmdExecuted()	
-				}		
-				ACTIVE(FIND_STRING(cCompStr,"'8'",1)):
-				{
-					nActiveInput=VD_SRC_VGA1
-					IF(nCmd=VD_SRC_VGA1) CmdExecuted()	
+					ACTIVE(FIND_STRING(cCompStr,"'1'",1)||FIND_STRING(cCompStr,"'2'",1)):
+					{
+						nActivePower=VD_PWR_ON
+						IF(nCmd=VD_PWR_ON) CmdExecuted()
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'0'",1)):
+					{
+						nActivePower=VD_PWR_OFF
+						IF(nCmd=VD_PWR_OFF) CmdExecuted()
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'OK'",1)):
+					{
+						if(nCmd=VD_PWR_OFF) nActivePower=VD_COOLING
+						if(nCmd=VD_PWR_ON or nCmdPwrOn) nActivePower=VD_WARMING
+					}
 				}	
+			}
+			CASE PollSrc:
+			{
+				SELECT
+				{
+					ACTIVE(FIND_STRING(cCompStr,"'1'",1)):
+					{
+						nActiveInput=VD_SRC_HDMI1
+						IF(nCmd=VD_SRC_HDMI1) CmdExecuted()					
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'2'",1)):
+					{
+						nActiveInput=VD_SRC_HDMI2
+						IF(nCmd=VD_SRC_HDMI2) CmdExecuted()	
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'3'",1)):
+					{
+						nActiveInput=VD_SRC_HDMI3
+						IF(nCmd=VD_SRC_HDMI3) CmdExecuted()	
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'4'",1)):
+					{
+						nActiveInput=VD_SRC_AUX1
+						IF(nCmd=VD_SRC_AUX1) CmdExecuted()	
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'5'",1)):
+					{
+						nActiveInput=VD_SRC_CMPNT1
+						IF(nCmd=VD_SRC_CMPNT1) CmdExecuted()	
+					}				
+					ACTIVE(FIND_STRING(cCompStr,"'6'",1)):
+					{
+						nActiveInput=VD_SRC_VID1
+						IF(nCmd=VD_SRC_VID1) CmdExecuted()					
+					}
+					ACTIVE(FIND_STRING(cCompStr,"'7'",1)):
+					{
+						nActiveInput=VD_SRC_VID2
+						IF(nCmd=VD_SRC_VID2) CmdExecuted()	
+					}		
+					ACTIVE(FIND_STRING(cCompStr,"'8'",1)):
+					{
+						nActiveInput=VD_SRC_VGA1
+						IF(nCmd=VD_SRC_VGA1) CmdExecuted()	
+					}	
+				}
 			}
 		}
 	}	
@@ -247,44 +251,48 @@ TIMELINE_EVENT[tlPoll]
 
 TIMELINE_EVENT[tlCmd]
 {
-	SWITCH(TIMELINE.SEQUENCE)
+	if(nErrorReceived) off[nErrorReceived]
+	else 
 	{
-		CASE 1:	//first time
+		SWITCH(TIMELINE.SEQUENCE)
 		{
-			SWITCH(nCmd)
+			CASE 1:	//first time
 			{
-				CASE VD_PWR_ON:
-				CASE VD_PWR_OFF:
+				SWITCH(nCmd)
 				{
-					SEND_STRING dvLCD,cCmdStr[nCmd]
-					nPollType=PollPwr
-				}
-				CASE VD_SRC_HDMI1:
-				CASE VD_SRC_HDMI2:
-				CASE VD_SRC_HDMI3:
-				CASE VD_SRC_AUX1:
-				CASE VD_SRC_VID1:
-				CASE VD_SRC_VID2:
-				CASE VD_SRC_VGA1:
-				CASE VD_SRC_CMPNT1:
-				{
-					IF(nActivePower=VD_PWR_ON)
+					CASE VD_PWR_ON:
+					CASE VD_PWR_OFF:
 					{
 						SEND_STRING dvLCD,cCmdStr[nCmd]
-						nPollType=PollSrc
-					}
-					ELSE
-					{
 						nPollType=PollPwr
-						on[nCmdPwrOn]
-						SEND_STRING dvLCD,cCmdStr[VD_PWR_ON]
+					}
+					CASE VD_SRC_HDMI1:
+					CASE VD_SRC_HDMI2:
+					CASE VD_SRC_HDMI3:
+					CASE VD_SRC_AUX1:
+					CASE VD_SRC_VID1:
+					CASE VD_SRC_VID2:
+					CASE VD_SRC_VGA1:
+					CASE VD_SRC_CMPNT1:
+					{
+						IF(nActivePower=VD_PWR_ON)
+						{
+							SEND_STRING dvLCD,cCmdStr[nCmd]
+							nPollType=PollSrc
+						}
+						ELSE
+						{
+							nPollType=PollPwr
+							on[nCmdPwrOn]
+							SEND_STRING dvLCD,cCmdStr[VD_PWR_ON]
+						}
 					}
 				}
 			}
-		}
-		CASE 2:	//2nd time
-		{
-			IF(nPollType) SEND_STRING dvLCD,cPollStr[nPollType]
+			CASE 2:	//2nd time
+			{
+				IF(nPollType) SEND_STRING dvLCD,cPollStr[nPollType]
+			}
 		}
 	}
 }

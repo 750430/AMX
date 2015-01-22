@@ -26,7 +26,7 @@ define_variable //IP Variables
 non_volatile	long		lReconnectTime[]={30000}
 non_volatile	long		lPollTL[]={30000}
 non_volatile	char		cBiampBuffer[255]
-volatile		integer		nShowIPFeedback
+volatile		integer		nShowIPFeedback[100]
 
 (***********************************************************)
 (*                GENERAL FUNCTIONS GO BELOW               *)
@@ -159,7 +159,7 @@ data_event[dvIPClient]
 	}
 	string:
 	{
-		if(nShowIPFeedback) 
+		if(nShowIPFeedback[get_last(dvIPClient)]) 
 		{
 			select
 			{
